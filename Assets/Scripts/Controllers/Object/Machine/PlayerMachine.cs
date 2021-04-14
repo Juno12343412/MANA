@@ -119,11 +119,11 @@ namespace UDBase.Controllers.ObjectSystem {
             foreach (var key in playerKeys)
                 key.Value.Update();
 
-            if (IsDead()) {
+            //if (IsDead()) {
 
-                MyStats.State = PlayerState.Dead;
-                DeadEvent();
-            }
+            //    MyStats.State = PlayerState.Dead;
+            //    DeadEvent();
+            //}
         }
 
         /// <summary>
