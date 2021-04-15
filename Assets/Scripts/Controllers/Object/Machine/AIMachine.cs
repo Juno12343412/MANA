@@ -274,5 +274,19 @@ namespace UDBase.Controllers.ObjectSystem
         {
             ItemDrop();
         }
+
+        protected virtual void AnimFrameStart()
+        {
+
+        }
+
+        protected virtual void AnimFrameUpdate()
+        {
+
+        }
+
+        protected virtual void AnimFrameEnd()
+        {
+        }
     }
 }

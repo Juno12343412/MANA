@@ -11,18 +11,21 @@ using Cinemachine;
 public class Obstacle : AIMachine
 {
     ULogger _log;
+    Animator _animtor;
+
+    [SerializeField] private GameObject _particle;
 
     protected sealed override void AISetting(ILog log)
     {
         _log = log.CreateLogger(this);
         _log.Message("AI 셋팅");
 
+        _animtor = GetComponent<Animator>();
+
         base.AISetting(log);
 
         Kind = ObjectKind.Item;
         MyStats.CurHP = MyStats.MaxHP = 100;
-
-        _log.Message("HP : " + MyStats.CurHP);
     }
 
     protected sealed override void IdleEvent()
@@ -69,13 +72,31 @@ public class Obstacle : AIMachine
         Destroy(gameObject);
     }
 
+    protected override void AnimFrameStart()
+    {
+    }
+
+    protected override void AnimFrameUpdate()
+    {
+
+    }
+
+    protected override void AnimFrameEnd()
+    {
+        _animtor.SetBool("isHurt", false);
+        _particle.SetActive(false);
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Attack"))
         {
-            //CameraUtils.Shake(25f, 0.5f);
-            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
             _log.Message("Hit : " + MyStats.CurHP);
+
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            _animtor.SetBool("isHurt", true);
+            _particle.SetActive(true);
+
             MyStats.CurHP -= 10;
         }
     }

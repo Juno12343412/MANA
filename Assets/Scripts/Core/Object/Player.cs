@@ -158,7 +158,13 @@ public class Player : PlayerMachine
                     break;
                 }
             }
-
+            else if (MyStats.State == PlayerState.Jump)
+            {
+                if (Input.GetKeyDown(KeyCode.Z))
+                {
+                    _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+                }
+            }
             // 하단 이동
             //if (Input.GetKeyDown(KeyCode.DownArrow))
             //{
