@@ -25,11 +25,11 @@ public class MapPortal : MonoBehaviour
 
     //포탈 밝기 동작 범위
     [Header("Max Portal Glow")]
-    [SerializeField] [Range(0,30.0f)] private float inPortalDistance = 8;
+    [SerializeField] [Range(0,30.0f)] private float inPortalDistance = 10;
 
     //기본 포탈 밝기
     [Header("Deafult Portal Glow")]
-    [SerializeField] [Range(0,30.0f)] private float deafultPortalGlow = 8;
+    [SerializeField] [Range(0,30.0f)] private float deafultPortalGlow = 10;
 
 
     #endregion

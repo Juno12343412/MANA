@@ -6,15 +6,15 @@ using UDBase.Utils;
 using Zenject;
 using UDBase.Controllers.LogSystem;
 
-namespace UDBase.Controllers.ObjectSystem {
-
+namespace UDBase.Controllers.ObjectSystem
+{
     public class AIMachine : MonoBehaviour, IObject, ILogContext
     {
         [Inject]
         ILog _log;
 
-        public string Name { get; private set; }
-        public ObjectKind Kind { get; private set; }
+        public string Name { get; protected set; }
+        public ObjectKind Kind { get; protected set; }
 
         /// <summary>
         /// AI의 기본정보
@@ -65,8 +65,8 @@ namespace UDBase.Controllers.ObjectSystem {
             /// </summary>
             public Item[] DropItems { get; set; }
         }
-        public Stats      MyStats { get; set; }
-               KeySetting aiKey;
+        public Stats MyStats { get; set; }
+        KeySetting aiKey;
 
         public bool IsDead()
         {
@@ -78,37 +78,47 @@ namespace UDBase.Controllers.ObjectSystem {
             MyStats.CurHP = 0;
         }
 
-        protected virtual void Start() {
+        protected virtual void Start()
+        {
 
             AISetting(_log);
             StartFSM();
         }
 
-        protected virtual void Update() {
+        protected virtual void Update()
+        {
 
             aiKey?.Update();
+
+            if (IsDead())
+            {
+                MyStats.State = AIState.Dead;
+            }
         }
 
         /// <summary>
         /// AI 셋팅하는 함수
         /// </summary>
-        protected virtual void AISetting(ILog log) {
+        protected virtual void AISetting(ILog log)
+        {
 
             Name = gameObject.name;     // 이름은 나중에 바꿔도 됨
+
+            MyStats = new Stats();
             MyStats.IsTrack = false;
 
             aiKey = new KeySetting(KeyCode.Q, Talk);
         }
 
-        void StartFSM() {
-
-            MyStats = new Stats();
+        void StartFSM()
+        {
 
             MyStats.State = AIState.Idle;
             StartCoroutine(MyStats.State.ToString());
         }
 
-        void ChanageState() {
+        void ChanageState()
+        {
 
             if (MyStats.State != AIState.Dead)
                 StartCoroutine(MyStats.State.ToString());
@@ -116,7 +126,8 @@ namespace UDBase.Controllers.ObjectSystem {
                 DeadEvent();
         }
 
-        IEnumerator Idle() {
+        IEnumerator Idle()
+        {
 
             while (MyStats.State == AIState.Idle)
             {
@@ -126,7 +137,8 @@ namespace UDBase.Controllers.ObjectSystem {
             ChanageState();
         }
 
-        IEnumerator Patrol() {
+        IEnumerator Patrol()
+        {
 
             while (MyStats.State == AIState.Patrol)
             {
@@ -136,7 +148,8 @@ namespace UDBase.Controllers.ObjectSystem {
             ChanageState();
         }
 
-        IEnumerator Track() {
+        IEnumerator Track()
+        {
 
             while (MyStats.State == AIState.Track)
             {
@@ -157,11 +170,11 @@ namespace UDBase.Controllers.ObjectSystem {
             ChanageState();
         }
 
-        void Talk() {
+        void Talk()
+        {
 
             if (Kind == ObjectKind.NPC)
             {
-
                 GameObject obj = GameObject.FindGameObjectWithTag("Player");
                 if (obj != null)
                 {
@@ -176,13 +189,40 @@ namespace UDBase.Controllers.ObjectSystem {
             }
         }
 
-        void ItemDrop() {
-            
-            for (int i = 0; i <= MyStats.DropItems.Length; i++) {
+        void ItemDrop()
+        {
 
-                if (MyStats.DropItems[i] && UnityEngine.Random.Range(0f, 100f) <= MyStats.DropItems[i].Drop) {
+            if (MyStats.DropItems != null)
+            {
+                for (int i = 0; i <= MyStats.DropItems.Length; i++)
+                {
+                    if (MyStats.DropItems[i] && UnityEngine.Random.Range(0f, 100f) <= MyStats.DropItems[i].Drop)
+                    {
 
-                    // 소환
+                        // 소환
+                    }
+                }
+            }
+        }
+
+        void OnCollisionEnter2D(Collision2D other)
+        {
+            if (other.gameObject.CompareTag("Player"))
+            {
+                if (Kind == ObjectKind.Item)
+                {
+                    Callback();
+                }
+            }
+        }
+
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.gameObject.CompareTag("Player"))
+            {
+                if (Kind == ObjectKind.Item)
+                {
+                    Callback();
                 }
             }
         }

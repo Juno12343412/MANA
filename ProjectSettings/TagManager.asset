@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Opacity background
+  - Stone
+  - Ground
+  - Attack
   layers:
   - Default
   - TransparentFX
@@ -18,7 +22,7 @@ TagManager:
   - Player
   - PlayerAttack
   - Portal
-  - 
+  - Stone
   - 
   - 
   - 
