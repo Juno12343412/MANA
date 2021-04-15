@@ -6,6 +6,7 @@ using UDBase.Controllers.LogSystem;
 using MANA.Enums;
 using UDBase.Utils;
 using Zenject;
+using Cinemachine;
 
 public class Obstacle : AIMachine
 {
@@ -73,7 +74,7 @@ public class Obstacle : AIMachine
         if (other.gameObject.CompareTag("Attack"))
         {
             //CameraUtils.Shake(25f, 0.5f);
-
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
             _log.Message("Hit : " + MyStats.CurHP);
             MyStats.CurHP -= 10;
         }

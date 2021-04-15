@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
+using Cinemachine;
 
 public class StoneObject : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class StoneObject : MonoBehaviour
 
     void Start()
     {
+        explosionEnd = false;
         gameObject.SetActive(true);
         stoneRig = gameObject.GetComponent<Rigidbody2D>();
         animator = gameObject.GetComponent<Animator>();
@@ -55,6 +57,7 @@ public class StoneObject : MonoBehaviour
 
     public void Explosion()
     {
+        
         stoneRig.constraints = RigidbodyConstraints2D.None;
         Vector3 distance = playerPos.position - transform.position;
         float distanceF = Vector3.Distance(playerPos.position, transform.position);
@@ -67,6 +70,10 @@ public class StoneObject : MonoBehaviour
         for (int i = 0; i < startLights.Length; i++)
         {
             startLights[i].SetActive(false);
+        }
+        if (gameObject.name == "Tuto_1_Ground_St_12")
+        {
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse(new Vector3(3, 3, 3));
         }
         explosionEnd = true;
     }
@@ -100,5 +107,23 @@ public class StoneObject : MonoBehaviour
             yield return null;
         }
         gameObject.SetActive(false);
+    }
+
+    IEnumerator CR_CameraShake()
+    {
+        while(!explosionEnd)
+        {
+            yield return new WaitForSeconds(0.1f);
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            yield return null;
+        }
+    }
+
+    public void StartCameraShake()
+    {
+        if(gameObject.name == "Tuto_1_Ground_St_12")
+        {
+            StartCoroutine(CR_CameraShake());
+        }
     }
 }
