@@ -84,7 +84,7 @@ public class Obstacle : AIMachine
     protected override void AnimFrameEnd()
     {
         _animtor.SetBool("isHurt", false);
-        _particle.SetActive(false);
+        //_particle.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -95,7 +95,7 @@ public class Obstacle : AIMachine
 
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
             _animtor.SetBool("isHurt", true);
-            _particle.SetActive(true);
+            //_particle.SetActive(true);
 
             MyStats.CurHP -= 10;
         }
