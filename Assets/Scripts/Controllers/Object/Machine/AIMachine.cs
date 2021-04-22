@@ -58,6 +58,11 @@ namespace UDBase.Controllers.ObjectSystem
             /// </summary>
             public bool IsTrack { get; set; }
 
+            /// <summary>
+            /// 현재 대화중인가 ?
+            /// </summary>
+            public bool IsTalk { get; set; }
+
             public AIState State { get; set; }
 
             /// <summary>
@@ -67,6 +72,8 @@ namespace UDBase.Controllers.ObjectSystem
         }
         public Stats MyStats { get; set; }
         KeySetting aiKey;
+
+        GameObject targetObj = null;
 
         public bool IsDead()
         {
@@ -87,13 +94,11 @@ namespace UDBase.Controllers.ObjectSystem
 
         protected virtual void Update()
         {
-
-            aiKey?.Update();
-
             if (IsDead())
-            {
                 MyStats.State = AIState.Dead;
-            }
+
+            CheckTalkRadius();
+            aiKey?.Update();
         }
 
         /// <summary>
@@ -101,13 +106,13 @@ namespace UDBase.Controllers.ObjectSystem
         /// </summary>
         protected virtual void AISetting(ILog log)
         {
-
             Name = gameObject.name;     // 이름은 나중에 바꿔도 됨
 
             MyStats = new Stats();
             MyStats.IsTrack = false;
 
             aiKey = new KeySetting(KeyCode.Q, Talk);
+            targetObj = GameObject.FindGameObjectWithTag("Player");
         }
 
         void StartFSM()
@@ -175,15 +180,13 @@ namespace UDBase.Controllers.ObjectSystem
 
             if (Kind == ObjectKind.NPC)
             {
-                GameObject obj = GameObject.FindGameObjectWithTag("Player");
-                if (obj != null)
+                if (targetObj != null)
                 {
-
-                    if (Vector2.Distance(gameObject.transform.position, obj.transform.position) <= MyStats.Radius)
+                    if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius)
                     {
 
-                        obj.GetComponent<PlayerMachine>().MyStats.State = PlayerState.Talk;
-                        Callback();
+                        targetObj.GetComponent<PlayerMachine>().MyStats.State = PlayerState.Talk;
+                        Callback(targetObj);
                     }
                 }
             }
@@ -205,13 +208,38 @@ namespace UDBase.Controllers.ObjectSystem
             }
         }
 
+        void CheckTalkRadius()
+        {
+            if (Kind == ObjectKind.NPC)
+            {
+                if (targetObj != null)
+                {
+                    if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius && !MyStats.IsTalk)
+                    {
+                        MyStats.IsTalk = true;
+                        targetObj.GetComponent<PlayerMachine>().MyStats.State = PlayerState.Talk;
+                        CallbackEnter(targetObj);
+                    }
+                    else if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius && MyStats.IsTalk)
+                    {
+                        MyStats.IsTalk = false;
+                        CallbackExit(targetObj);
+                    }
+                }
+            }
+        }
+
         void OnCollisionEnter2D(Collision2D other)
         {
             if (other.gameObject.CompareTag("Player"))
             {
-                if (Kind == ObjectKind.Item)
+                switch (Kind)
                 {
-                    Callback();
+                    case ObjectKind.Item:
+                        Callback(other.gameObject);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -220,9 +248,13 @@ namespace UDBase.Controllers.ObjectSystem
         {
             if (other.gameObject.CompareTag("Player"))
             {
-                if (Kind == ObjectKind.Item)
+                switch (Kind)
                 {
-                    Callback();
+                    case ObjectKind.Item:
+                        Callback(other.gameObject);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -254,7 +286,23 @@ namespace UDBase.Controllers.ObjectSystem
         /// <summary>
         /// 해당 AI와 대화를 할 때 실행하는 함수
         /// </summary>
-        protected virtual void Callback()
+        protected virtual void CallbackEnter(GameObject _pObj)
+        {
+     
+        }
+
+        /// <summary>
+        /// 해당 AI와 대화 범위를 나갈 때
+        /// </summary>
+        protected virtual void CallbackExit(GameObject _pObj)
+        {
+
+        }
+
+        /// <summary>
+        /// 해당 AI와 대화를 할 때 실행하는 함수
+        /// </summary>
+        protected virtual void Callback(GameObject _pObj)
         {
 
         }

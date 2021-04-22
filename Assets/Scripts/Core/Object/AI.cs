@@ -38,11 +38,11 @@ public class AI : AIMachine
         base.TrackEvent();
     }
 
-    protected sealed override void Callback()
+    protected sealed override void Callback(GameObject pObj)
     {
         _log.Message("AI Callback");
 
-        base.Callback();
+        base.Callback(pObj);
     }
 
     protected sealed override void AttackEvent()

@@ -97,6 +97,9 @@ namespace UDBase.UI.Common {
 		/// </summary>
 		public void Show(string group) {
 			var elements = UIElement.Instances;
+
+			Debug.Log("elements : " + elements.Count);
+
 			foreach (var element in elements) {
 				if (!element.HasParent && (element.Group == group)) {
 					element.Show();
@@ -118,6 +121,18 @@ namespace UDBase.UI.Common {
 			foreach (var element in hideElements) {
 				element.Hide();
             }
+		}
+
+		public GameObject Find(string group) {
+			var elements = UIElement.Instances;
+			foreach (var element in elements)
+			{
+				if (element.Group == group)
+				{
+					return element.gameObject;
+				}
+			}
+			return null;
 		}
 	}
 }

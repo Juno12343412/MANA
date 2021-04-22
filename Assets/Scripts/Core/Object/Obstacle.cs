@@ -1,19 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
+using UDBase.UI.Common;
 using MANA.Enums;
-using UDBase.Utils;
 using Zenject;
 using Cinemachine;
 
 public class Obstacle : AIMachine
 {
+    [Inject]
+    UIManager _ui;
+
     ULogger _log;
     Animator _animtor;
 
     [SerializeField] private GameObject _particle;
+    [SerializeField] private GameObject _interaction;
 
     protected sealed override void AISetting(ILog log)
     {
@@ -24,8 +29,9 @@ public class Obstacle : AIMachine
 
         base.AISetting(log);
 
-        Kind = ObjectKind.Item;
+        Kind = ObjectKind.NPC;
         MyStats.CurHP = MyStats.MaxHP = 100;
+        MyStats.Radius = 5f;
     }
 
     protected sealed override void IdleEvent()
@@ -49,11 +55,42 @@ public class Obstacle : AIMachine
         base.TrackEvent();
     }
 
-    protected sealed override void Callback()
+    protected sealed override void CallbackEnter(GameObject pObj)
+    {
+        _log.Message("AI CallbackEnter");
+
+        switch (Kind)
+        {
+            case ObjectKind.NPC:
+                //_log.Message("Pos : " + Camera.main.WorldToScreenPoint(transform.position + Vector3.up));
+
+                //_ui.Show("InteractionUI");
+                //_ui.Find("InteractionUI").transform.position = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
+                //_ui.Find("InteractionUI_Talk").GetComponent<TextMeshProUGUI>().text = "대화";
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected sealed override void CallbackExit(GameObject pObj)
+    {
+        _log.Message("AI CallbackExit");
+
+        switch (Kind)
+        {
+            case ObjectKind.NPC:
+                //_ui.Hide("InteractionUI");
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected sealed override void Callback(GameObject pObj)
     {
         _log.Message("AI Callback");
 
-        base.Callback();
     }
 
     protected sealed override void AttackEvent()

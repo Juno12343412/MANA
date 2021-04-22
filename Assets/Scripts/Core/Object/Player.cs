@@ -175,17 +175,17 @@ public class Player : PlayerMachine
         }
     }
 
-    void AnimFrameStart()
+    protected override void AnimFrameStart()
     {
 
     }
 
-    void AnimFrameUpdate()
+    protected override void AnimFrameUpdate()
     {
 
     }
 
-    void AnimFrameEnd()
+    protected override void AnimFrameEnd()
     {
         MyStats.IsAttack = false;
         _attackColiders[0].gameObject.SetActive(false);

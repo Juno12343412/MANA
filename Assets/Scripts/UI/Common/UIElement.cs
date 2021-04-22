@@ -160,13 +160,17 @@ namespace UDBase.UI.Common {
         }
 
         void OnEnable() {
-            Instances.Add(this);
+            //Instances.Add(this);
             _events?.Subscribe<UI_ElementHidden>(this, OnElementHidden);
         }
 
         void OnDisable() {
-            Instances.Remove(this);
+            //Instances.Remove(this);
             _events?.Unsubscribe<UI_ElementHidden>(OnElementHidden);
+        }
+
+        void OnDestroy() {
+            Instances.Remove(this);
         }
 
         public bool CanShow() {
