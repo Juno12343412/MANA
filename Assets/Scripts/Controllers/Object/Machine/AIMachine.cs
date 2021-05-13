@@ -111,7 +111,7 @@ namespace UDBase.Controllers.ObjectSystem
             MyStats = new Stats();
             MyStats.IsTrack = false;
 
-            aiKey = new KeySetting(KeyCode.Q, Talk);
+            aiKey = new KeySetting(KeyCode.Q, Talk, KeyKind.Down);
             targetObj = GameObject.FindGameObjectWithTag("Player");
         }
 
@@ -184,8 +184,7 @@ namespace UDBase.Controllers.ObjectSystem
                 {
                     if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius)
                     {
-
-                        targetObj.GetComponent<PlayerMachine>().MyStats.State = PlayerState.Talk;
+                        targetObj.GetComponent<PlayerMachine>()._player._stats.State = PlayerState.Talk;
                         Callback(targetObj);
                     }
                 }
@@ -217,7 +216,7 @@ namespace UDBase.Controllers.ObjectSystem
                     if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius && !MyStats.IsTalk)
                     {
                         MyStats.IsTalk = true;
-                        targetObj.GetComponent<PlayerMachine>().MyStats.State = PlayerState.Talk;
+                        targetObj.GetComponent<PlayerMachine>()._player._stats.State = PlayerState.Talk;
                         CallbackEnter(targetObj);
                     }
                     else if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius && MyStats.IsTalk)

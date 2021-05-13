@@ -14,11 +14,16 @@ public class Obstacle : AIMachine
     [Inject]
     UIManager _ui;
 
+    [Inject]
+    PlayerManager _player;
+
     ULogger _log;
     Animator _animtor;
 
     [SerializeField] private GameObject _particle;
     [SerializeField] private GameObject _interaction;
+
+    [SerializeField] private List<string> _textList;
 
     protected sealed override void AISetting(ILog log)
     {
@@ -67,6 +72,7 @@ public class Obstacle : AIMachine
                 //_ui.Show("InteractionUI");
                 //_ui.Find("InteractionUI").transform.position = Camera.main.WorldToScreenPoint(transform.position + Vector3.up);
                 //_ui.Find("InteractionUI_Talk").GetComponent<TextMeshProUGUI>().text = "대화";
+                _interaction.SetActive(true);
                 break;
             default:
                 break;
@@ -81,6 +87,8 @@ public class Obstacle : AIMachine
         {
             case ObjectKind.NPC:
                 //_ui.Hide("InteractionUI");
+                TextBox.instance.TalkEnd();
+                _interaction.SetActive(false);
                 break;
             default:
                 break;
@@ -90,7 +98,15 @@ public class Obstacle : AIMachine
     protected sealed override void Callback(GameObject pObj)
     {
         _log.Message("AI Callback");
-
+        switch (Kind)
+        {
+            case ObjectKind.NPC:
+                //_ui.Hide("InteractionUI");
+                TextBox.instance.SetTalk(_textList, true);
+                break;
+            default:
+                break;
+        }
     }
 
     protected sealed override void AttackEvent()

@@ -115,7 +115,7 @@ namespace UDBase.UI.Common {
         [Inject]
         public void Init(IEvent events)
         {
-            Debug.Log("하이요");
+            Debug.Log(gameObject.name + "하이오");
 
             _events = events;
             if ( HasChilds ) { 

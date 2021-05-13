@@ -5,6 +5,7 @@ using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using MANA.Enums;
 using UDBase.Utils;
+using Zenject;
 
 public class Player : PlayerMachine
 {
@@ -26,9 +27,13 @@ public class Player : PlayerMachine
         _log = log.CreateLogger(this);
         base.PlayerSetting(log);
 
-        MyStats.CurHP = MyStats.MaxHP = 100;
-        MyStats.JumpPower = 5;
-        MyStats.MoveSpeed = 5;
+        _player._stats.CurHP = _player._stats.MaxHP = 100;
+        _player._stats.Damage = _player._stats.Damage = 10;
+        _player._stats.AttackDuration = _player._stats.AttackDuration = 2;
+        _player._stats.SpecialAttackDuration = _player._stats.SpecialAttackDuration = 100;
+        _player._stats.AttackSpeed = _player._stats.AttackSpeed = 2;
+        _player._stats.JumpPower = 5;
+        _player._stats.MoveSpeed = 5;
 
         _renderer = GetComponent<SpriteRenderer>();
         _rigid2D = GetComponent<Rigidbody2D>();
@@ -43,7 +48,7 @@ public class Player : PlayerMachine
 
     protected sealed override void WalkEvent()
     {
-        if (!MyStats.IsAttack)
+        if (!_player._stats.IsAttack)
         {
             base.WalkEvent();
 
@@ -56,9 +61,9 @@ public class Player : PlayerMachine
 
                 _renderer.flipX = x == 1 ? false : true;
 
-                if (_rigid2D.velocity.x <= MyStats.MoveSpeed && _rigid2D.velocity.x >= -MyStats.MoveSpeed)
+                if (_rigid2D.velocity.x <= _player._stats.MoveSpeed && _rigid2D.velocity.x >= -_player._stats.MoveSpeed)
                 {
-                    _rigid2D.velocity += new Vector2(x, 0) * MyStats.MoveSpeed * 0.05f;
+                    _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
                 }
             }
             else
@@ -66,7 +71,7 @@ public class Player : PlayerMachine
                 _animtor.SetBool("isWalk", false);
 
                 _rigid2D.velocity = new Vector2(0, _rigid2D.velocity.y);
-                MyStats.State = PlayerState.Idle;
+                _player._stats.State = PlayerState.Idle;
                 _log.Message("초기화");
             }
         }
@@ -82,11 +87,11 @@ public class Player : PlayerMachine
     protected sealed override void JumpEvent()
     {
         // 점프하는 로직
-        if (!MyStats.IsJump)
+        if (!_player._stats.IsJump)
         {
             base.JumpEvent();
 
-            MyStats.IsJump = true;
+            _player._stats.IsJump = true;
             StartCoroutine(GetJumpForce(1));
         }
     }
@@ -100,7 +105,7 @@ public class Player : PlayerMachine
     {
         base.AttackEvent();
 
-        MyStats.IsAttack = true;
+        _player._stats.IsAttack = true;
         _attackColiders[0].gameObject.SetActive(true);
 
         _animtor.SetBool("isAttack", true);
@@ -113,9 +118,9 @@ public class Player : PlayerMachine
     {
         base.SpecialAttackEvent();
 
-        if (MyStats.IsJump)
+        if (_player._stats.IsJump)
         {
-            MyStats.State = PlayerState.Idle;
+            _player._stats.State = PlayerState.Idle;
             return;
         }
     }
@@ -132,10 +137,10 @@ public class Player : PlayerMachine
 
         while (progress <= time)
         {
-            _log.Message("Combo " + MyStats.State);
+            _log.Message("Combo " + _player._stats.State);
 
             // 방향 공격
-            if (MyStats.State == PlayerState.Attack)
+            if (_player._stats.State == PlayerState.Attack)
             {
                 // ...
                 _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
@@ -158,7 +163,7 @@ public class Player : PlayerMachine
                     break;
                 }
             }
-            else if (MyStats.State == PlayerState.Jump)
+            else if (_player._stats.State == PlayerState.Jump)
             {
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
@@ -187,7 +192,7 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameEnd()
     {
-        MyStats.IsAttack = false;
+        _player._stats.IsAttack = false;
         _attackColiders[0].gameObject.SetActive(false);
 
         _animtor.SetBool("isAttack", false);
@@ -217,8 +222,8 @@ public class Player : PlayerMachine
 
         _animtor.SetInteger("Jump", 1);
         _renderer.sprite = _upImg;
-        _rigid2D.velocity = new Vector2(_rigid2D.velocity.x, 1 * MyStats.JumpPower);
-        StartCoroutine(GetKeyTime(1f, MyStats.State));
+        _rigid2D.velocity = new Vector2(_rigid2D.velocity.x, 1 * _player._stats.JumpPower);
+        StartCoroutine(GetKeyTime(1f, _player._stats.State));
 
         while (progress <= time)
         {
@@ -227,7 +232,7 @@ public class Player : PlayerMachine
 
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
-                _rigid2D.velocity += Vector2.up * MyStats.JumpPower * Time.deltaTime;
+                _rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
                 _renderer.sprite = _upImg;
                 _log.Message("점프력 : " + _rigid2D.velocity);
                 progress += Time.deltaTime;
@@ -240,12 +245,12 @@ public class Player : PlayerMachine
             }
         }
         _animtor.SetInteger("Jump", 2);
-        StartCoroutine(GetKeyTime(1, MyStats.State));
+        StartCoroutine(GetKeyTime(1, _player._stats.State));
     }
 
     void OnCollisionEnter2D(Collision2D other)
     {
         _animtor.SetInteger("Jump", 0);
-        MyStats.IsJump = false;
+        _player._stats.IsJump = false;
     }
 }

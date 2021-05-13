@@ -98,10 +98,8 @@ namespace UDBase.UI.Common {
 		public void Show(string group) {
 			var elements = UIElement.Instances;
 
-			Debug.Log("elements : " + elements.Count);
-
 			foreach (var element in elements) {
-				if (!element.HasParent && (element.Group == group)) {
+				if (element.Group == group) {
 					element.Show();
 				}
 			}
@@ -114,7 +112,7 @@ namespace UDBase.UI.Common {
 			var hideElements = new HashSet<UIElement>();
 
 			foreach (var element in UIElement.Instances) {
-				if (!element.HasParent && (element.Group == group)) {
+				if (element.Group == group) {
 					hideElements.Add(element);
 				}
 			}
@@ -125,6 +123,7 @@ namespace UDBase.UI.Common {
 
 		public GameObject Find(string group) {
 			var elements = UIElement.Instances;
+
 			foreach (var element in elements)
 			{
 				if (element.Group == group)

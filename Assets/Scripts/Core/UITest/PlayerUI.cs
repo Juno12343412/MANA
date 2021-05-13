@@ -18,19 +18,23 @@ public class PlayerUI : UIElement
     [Header("Mana")]
     [SerializeField] private Text _manaText;
 
-    [SerializeField] Player _player;
+    [Inject]
+    public PlayerManager _player;
+
     void Start()
     {
-        _player.MyStats.SpecialAttackDuration = 50;
-        _player.MyStats.CurHP = 97;
+        _player._stats.SpecialAttackDuration = 50;
+        _player._stats.CurHP = 97;
     }
 
     void LateUpdate()
     {
+        Debug.Log(_player._stats.SpecialAttackDuration);
         if (_player != null)
         {
-            _skillGauge.fillAmount = _player.MyStats.SpecialAttackDuration / 100;
-            _hpGauge.fillAmount = _player.MyStats.CurHP / _player.MyStats.MaxHP;
+
+            _skillGauge.fillAmount = _player._stats.SpecialAttackDuration / 100;
+            _hpGauge.fillAmount = _player._stats.CurHP / _player._stats.MaxHP;
         }
     }
 }

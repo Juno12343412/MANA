@@ -102,7 +102,6 @@ public class StoneObject : MonoBehaviour
         while(sprite.color.a > 0.1f)
         {
             sprite.color = new Color(1, 1, 1, progress);
-            Debug.Log("시작 : " + sprite.color.a);
             progress -= Time.deltaTime;
             yield return null;
         }
