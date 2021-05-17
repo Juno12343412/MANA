@@ -6,7 +6,7 @@
     public enum ObjectKind : byte {
         
         Player,
-        NPC, Item,
+        NPC, Item, Obstacle,
         Enemy, Boss,
         NONE = 99
     }
@@ -52,5 +52,15 @@
 
         Test,
         NONE = 99
+    }
+
+    /// <summary>
+    /// 파괴가능 오브젝트 종류
+    /// </summary>
+    enum DestructKind : byte
+    {
+        Destructible,
+        Grass,
+        Explosive
     }
 }

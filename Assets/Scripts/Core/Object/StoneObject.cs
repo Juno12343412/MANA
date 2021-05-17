@@ -105,7 +105,7 @@ public class StoneObject : MonoBehaviour
             progress -= Time.deltaTime;
             yield return null;
         }
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     IEnumerator CR_CameraShake()
