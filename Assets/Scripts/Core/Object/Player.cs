@@ -14,7 +14,7 @@ public class Player : PlayerMachine
     [SerializeField] private float _comboGauge = 0;
 
     [SerializeField] private Collider2D[] _attackColiders;
-    [SerializeField] private Vector2 _attackDir = Vector2.zero;
+    public Vector2 _attackDir = Vector2.zero;
 
     [SerializeField] private Sprite _upImg;
 
@@ -22,6 +22,7 @@ public class Player : PlayerMachine
     private Animator _animtor;
     private Rigidbody2D _rigid2D;
 
+    
     protected sealed override void PlayerSetting(ILog log)
     {
         _log = log.CreateLogger(this);
