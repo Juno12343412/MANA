@@ -11,10 +11,11 @@ public class Player : PlayerMachine
 {
     ULogger _log;
 
+    public Vector2 _attackDir = Vector2.zero;
+
     [SerializeField] private float _comboGauge = 0;
 
     [SerializeField] private Collider2D[] _attackColiders;
-    public Vector2 _attackDir = Vector2.zero;
 
     [SerializeField] private Sprite _upImg;
 
@@ -22,7 +23,6 @@ public class Player : PlayerMachine
     private Animator _animtor;
     private Rigidbody2D _rigid2D;
 
-    
     protected sealed override void PlayerSetting(ILog log)
     {
         _log = log.CreateLogger(this);
@@ -62,10 +62,13 @@ public class Player : PlayerMachine
 
                 _renderer.flipX = x == 1 ? false : true;
 
-                if (_rigid2D.velocity.x <= _player._stats.MoveSpeed && _rigid2D.velocity.x >= -_player._stats.MoveSpeed)
-                {
-                    _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
-                }
+                _log.Message("Velocity1 : " + _rigid2D.velocity);
+                _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
+
+                if (_rigid2D.velocity.x > _player._stats.MoveSpeed)
+                    _rigid2D.velocity = new Vector2(_player._stats.MoveSpeed, _rigid2D.velocity.y);
+                else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
+                    _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
             }
             else
             {
@@ -73,7 +76,6 @@ public class Player : PlayerMachine
 
                 _rigid2D.velocity = new Vector2(0, _rigid2D.velocity.y);
                 _player._stats.State = PlayerState.Idle;
-                _log.Message("초기화");
             }
         }
     }
@@ -138,8 +140,6 @@ public class Player : PlayerMachine
 
         while (progress <= time)
         {
-            _log.Message("Combo " + _player._stats.State);
-
             // 방향 공격
             if (_player._stats.State == PlayerState.Attack)
             {
@@ -148,8 +148,6 @@ public class Player : PlayerMachine
 
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
-                    _log.Message("Combo2 : " + _comboGauge);
-
                     if (_comboGauge != 2)
                         _comboGauge++;
                     else
@@ -223,19 +221,19 @@ public class Player : PlayerMachine
 
         _animtor.SetInteger("Jump", 1);
         _renderer.sprite = _upImg;
-        _rigid2D.velocity = new Vector2(_rigid2D.velocity.x, 1 * _player._stats.JumpPower);
+        _rigid2D.velocity = new Vector2(_rigid2D.velocity.x, _player._stats.JumpPower);
+
         StartCoroutine(GetKeyTime(1f, _player._stats.State));
 
         while (progress <= time)
         {
             _renderer.sprite = _upImg;
-            Debug.Log("이미지 : " + _renderer.sprite);
 
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
                 _rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
                 _renderer.sprite = _upImg;
-                _log.Message("점프력 : " + _rigid2D.velocity);
+
                 progress += Time.deltaTime;
                 yield return null;
             }
