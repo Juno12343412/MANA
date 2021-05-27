@@ -34,37 +34,34 @@ public class StoneObject : MonoBehaviour
         int randDir = Random.Range(0, 2); //
 
         animator.SetInteger("shakeDir", randDir);
-        
+
     }
 
-   
+
     void Update()
     {
-        
+
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (explosionEnd)
         {
-            if (other.gameObject.CompareTag("Ground"))
-            {
-                StartCoroutine(CR_StoneErase(1));
-                explosionEnd = false;
-            }
+            
+            StartCoroutine(CR_StoneErase(1));
+            explosionEnd = false;
         }
     }
 
     public void Explosion()
     {
-        
         stoneRig.constraints = RigidbodyConstraints2D.None;
         Vector3 distance = playerPos.position - transform.position;
         float distanceF = Vector3.Distance(playerPos.position, transform.position);
         distanceF = distanceF >= forcePower ? forcePower : distanceF;
-        distance = Vector3.Normalize(distance);  
-        distance.y = distance.y < 0 ? 0 : distance.y;  
-        
+        distance = Vector3.Normalize(distance);
+        distance.y = distance.y < 0 ? 0 : distance.y;
+
         stoneRig.AddForce(-distance * (forcePower * 5 / distanceF), ForceMode2D.Impulse);
         animator.SetBool("isStart", true);
         for (int i = 0; i < startLights.Length; i++)
@@ -74,6 +71,7 @@ public class StoneObject : MonoBehaviour
         if (gameObject.name == "Tuto_1_Ground_St_12")
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse(new Vector3(3, 3, 3));
+            StartCoroutine(CR_StoneErase(1));
         }
         explosionEnd = true;
     }
@@ -84,7 +82,7 @@ public class StoneObject : MonoBehaviour
         startLights[num].GetComponent<Light2D>().intensity = 0;
         StartCoroutine(CR_IntensityUp(startLights[num].GetComponent<Light2D>()));
     }
-    
+
     IEnumerator CR_IntensityUp(Light2D light)
     {
         while (light.intensity <= 14)
@@ -99,7 +97,7 @@ public class StoneObject : MonoBehaviour
         yield return new WaitForSeconds(_time);
         float progress = 1f;
 
-        while(sprite.color.a > 0.1f)
+        while (sprite.color.a > 0.1f)
         {
             sprite.color = new Color(1, 1, 1, progress);
             progress -= Time.deltaTime;
@@ -110,7 +108,7 @@ public class StoneObject : MonoBehaviour
 
     IEnumerator CR_CameraShake()
     {
-        while(!explosionEnd)
+        while (!explosionEnd)
         {
             yield return new WaitForSeconds(0.1f);
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
@@ -120,7 +118,7 @@ public class StoneObject : MonoBehaviour
 
     public void StartCameraShake()
     {
-        if(gameObject.name == "Tuto_1_Ground_St_12")
+        if (gameObject.name == "Tuto_1_Ground_St_12")
         {
             StartCoroutine(CR_CameraShake());
         }
