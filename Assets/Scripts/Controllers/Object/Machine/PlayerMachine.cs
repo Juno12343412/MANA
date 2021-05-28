@@ -163,7 +163,6 @@ namespace UDBase.Controllers.ObjectSystem {
 
             _player._stats.IsAttack = false;
             _player._stats.IsSpecialAttack = false;
-            _player._stats.IsJump = false;
             _player._stats.IsMove = false;
 
             _player._stats.State = PlayerState.Idle;

@@ -13,6 +13,7 @@ public class GrassPhysics : MonoBehaviour
     [SerializeField] private float bendFactor = 0.5f;
 
 
+    private Grasses grasses;
     private bool  isBending;
     private bool  isRebounding;
 
@@ -35,6 +36,7 @@ public class GrassPhysics : MonoBehaviour
 
         transformCache = transform;
         meshCache = GetComponent<MeshFilter>().mesh;
+        grasses = GetComponentInParent<Grasses>();
     }
 
     private void OnDestroy()
@@ -59,6 +61,11 @@ public class GrassPhysics : MonoBehaviour
                 isRebounding = true;
             }
         }
+        if(col.CompareTag("Attack"))
+        {
+            grasses.DestroyGrass();
+        }
+        
     }
 
     private void OnTriggerStay2D(Collider2D col)
