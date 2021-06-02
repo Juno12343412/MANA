@@ -144,10 +144,12 @@ public class Player : PlayerMachine
             if (_player._stats.State == PlayerState.Attack)
             {
                 // ...
-                _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
 
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
+                    if (Input.GetAxisRaw("Horizontal") != 0)
+                        _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+                    
                     if (_comboGauge != 2)
                         _comboGauge++;
                     else
@@ -166,7 +168,8 @@ public class Player : PlayerMachine
             {
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
-                    _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
+                    if (Input.GetAxisRaw("Horizontal") != 0)
+                        _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
                 }
             }
             // 하단 이동

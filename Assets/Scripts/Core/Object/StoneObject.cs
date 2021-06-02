@@ -10,6 +10,7 @@ public class StoneObject : MonoBehaviour
     [SerializeField] float forcePower = 0f;
     [SerializeField] Transform playerPos;
     [SerializeField] GameObject[] startLights;
+    [SerializeField] GameObject startEffects;
 
     #endregion
 
@@ -55,6 +56,10 @@ public class StoneObject : MonoBehaviour
 
     public void Explosion()
     {
+        if(startEffects != null)
+        {
+            startEffects.SetActive(true);
+        }
         stoneRig.constraints = RigidbodyConstraints2D.None;
         Vector3 distance = playerPos.position - transform.position;
         float distanceF = Vector3.Distance(playerPos.position, transform.position);

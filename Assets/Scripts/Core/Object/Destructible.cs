@@ -44,7 +44,7 @@ public class Destructible : AIMachine
 
             if(kind != DestructKind.Grass)
                 GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-            Debug.Log(other.gameObject.GetComponentInParent<Player>()._attackDir);
+            Debug.Log("AA : " + other.gameObject.GetComponentInParent<Player>()._attackDir);
             switch (other.gameObject.GetComponentInParent<Player>()._attackDir)
             {
                 case Vector2 v when v.Equals(Vector2.left):
