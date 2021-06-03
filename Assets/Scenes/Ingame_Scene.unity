@@ -10153,7 +10153,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768889053}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.027776271, y: -1.5, z: -10}
+  m_LocalPosition: {x: 0.029471576, y: -1.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1235160434}
@@ -13663,6 +13663,7 @@ MonoBehaviour:
   _comboGauge: 0
   _attackColiders:
   - {fileID: 339983030}
+  _startImg: {fileID: 21300000, guid: 10ec35c9934e76b43a1bf4a56b8b21b1, type: 3}
   _upImg: {fileID: 21300000, guid: 7d20f8ea36808ed4ea7eedc4c8f66dd0, type: 3}
 --- !u!95 &1133374054
 Animator:
@@ -13784,7 +13785,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1157726438}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.027776271, y: -4.596672, z: -10}
+  m_LocalPosition: {x: 0.029471576, y: -4.596672, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 338946799}

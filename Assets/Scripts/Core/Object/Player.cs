@@ -4,8 +4,6 @@ using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using MANA.Enums;
-using UDBase.Utils;
-using Zenject;
 
 public class Player : PlayerMachine
 {
@@ -17,11 +15,14 @@ public class Player : PlayerMachine
 
     [SerializeField] private Collider2D[] _attackColiders;
 
+    [SerializeField] private Sprite _startImg;
     [SerializeField] private Sprite _upImg;
 
     private SpriteRenderer _renderer;
     private Animator _animtor;
     private Rigidbody2D _rigid2D;
+
+    bool isStart = false;
 
     protected sealed override void PlayerSetting(ILog log)
     {
@@ -39,11 +40,20 @@ public class Player : PlayerMachine
         _renderer = GetComponent<SpriteRenderer>();
         _rigid2D = GetComponent<Rigidbody2D>();
         _animtor = GetComponent<Animator>();
+        _animtor.enabled = false;
+
+        _renderer.sprite = _startImg;
+
+        Invoke("StartEvent", 5f);
     }
 
     protected sealed override void IdleEvent()
     {
         base.IdleEvent();
+
+        if (!isStart)
+            return;
+
         _animtor.SetBool("isWalk", false);
     }
 
@@ -84,11 +94,16 @@ public class Player : PlayerMachine
     {
         base.RunEvent();
 
+        if (!isStart)
+            return;
         // 움직이는 로직
     }
 
     protected sealed override void JumpEvent()
     {
+        if (!isStart)
+            return;
+
         // 점프하는 로직
         if (!_player._stats.IsJump)
         {
@@ -102,11 +117,17 @@ public class Player : PlayerMachine
     protected sealed override void TalkEvent()
     {
         base.TalkEvent();
+
+        if (!isStart)
+            return;
     }
 
     protected sealed override void AttackEvent()
     {
         base.AttackEvent();
+
+        if (!isStart)
+            return;
 
         _player._stats.IsAttack = true;
         _attackColiders[0].gameObject.SetActive(true);
@@ -121,6 +142,9 @@ public class Player : PlayerMachine
     {
         base.SpecialAttackEvent();
 
+        if (!isStart)
+            return;
+
         if (_player._stats.IsJump)
         {
             _player._stats.State = PlayerState.Idle;
@@ -131,6 +155,9 @@ public class Player : PlayerMachine
     protected sealed override void DeadEvent()
     {
         base.DeadEvent();
+
+        if (!isStart)
+            return;
     }
 
     IEnumerator Combo(float time = 0f)
@@ -144,39 +171,19 @@ public class Player : PlayerMachine
             if (_player._stats.State == PlayerState.Attack)
             {
                 // ...
+                _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
-                    if (Input.GetAxisRaw("Horizontal") != 0)
-                        _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-                    
+                    _animtor.SetFloat("AttackY", _attackDir.y);
+
                     if (_comboGauge != 2)
                         _comboGauge++;
                     else
                         _comboGauge = 0;
-
-                    break;
-                }
-
-                // 하단 공격
-                if (Input.GetKeyDown(KeyCode.DownArrow))
-                {
                     break;
                 }
             }
-            else if (_player._stats.State == PlayerState.Jump)
-            {
-                if (Input.GetKeyDown(KeyCode.Z))
-                {
-                    if (Input.GetAxisRaw("Horizontal") != 0)
-                        _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), 0);
-                }
-            }
-            // 하단 이동
-            //if (Input.GetKeyDown(KeyCode.DownArrow))
-            //{
-            //    _rigid2D.velocity = Vector2.down * MyStats.JumpPower * 2;
-            //}
             progress += Time.deltaTime;
             yield return null;
         }
@@ -194,11 +201,17 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameEnd()
     {
-        _player._stats.IsAttack = false;
-        _attackColiders[0].gameObject.SetActive(false);
+        if (_animtor.GetBool("isStart"))
+            _animtor.SetBool("isStart", false);
+        else
+        {
+            _player._stats.IsAttack = false;
+            _attackColiders[0].gameObject.SetActive(false);
 
-        _animtor.SetBool("isAttack", false);
-        _animtor.SetFloat("Attack", 0);
+            _animtor.SetBool("isAttack", false);
+            _animtor.SetFloat("Attack", 0);
+            _animtor.SetInteger("AttackY", 0);
+        }
     }
 
     IEnumerator GetKeyTime(float time = 1f, PlayerState state = PlayerState.NONE)
@@ -252,7 +265,18 @@ public class Player : PlayerMachine
 
     void OnCollisionEnter2D(Collision2D other)
     {
+        if (!isStart)
+            return;
+
         _animtor.SetInteger("Jump", 0);
         _player._stats.IsJump = false;
+    }
+
+    void StartEvent()
+    {
+        isStart = true;
+
+        _animtor.enabled = true;
+        _animtor.SetBool("isStart", true);
     }
 }

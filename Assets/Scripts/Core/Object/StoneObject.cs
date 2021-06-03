@@ -35,13 +35,6 @@ public class StoneObject : MonoBehaviour
         int randDir = Random.Range(0, 2); //
 
         animator.SetInteger("shakeDir", randDir);
-
-    }
-
-
-    void Update()
-    {
-
     }
 
     private void OnCollisionEnter2D(Collision2D other)
