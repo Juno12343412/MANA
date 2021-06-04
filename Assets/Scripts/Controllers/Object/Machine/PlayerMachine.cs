@@ -151,7 +151,6 @@ namespace UDBase.Controllers.ObjectSystem {
 
             playerKeys.Add("Jump1", new KeySetting(KeyCode.C, JumpEvent, KeyKind.Down));
             playerKeys.Add("Jump2", new KeySetting(KeyCode.Space, JumpEvent, KeyKind.Down));
-            playerKeys.Add("Jump3", new KeySetting(KeyCode.UpArrow, JumpEvent, KeyKind.Down));
 
             playerKeys.Add("Option", new KeySetting(KeyCode.Escape, OptionEvent, KeyKind.Down));
         }

@@ -23,9 +23,9 @@ TagManager:
   - PlayerAttack
   - Portal
   - Stone
-  - 
-  - 
-  - 
+  - Far
+  - Mid
+  - Near
   - 
   - 
   - 
@@ -42,6 +42,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Far
+    uniqueID: 2026619569
+    locked: 0
+  - name: Mid
+    uniqueID: 1393068147
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Near
+    uniqueID: 495781107
+    locked: 0
+  - name: Ui
+    uniqueID: 1917124705
     locked: 0

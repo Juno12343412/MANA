@@ -3,18 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
-using Zenject;
+using Cinemachine;
+using MANA.Enums;
 
 public class AI : AIMachine
 {
     ULogger _log;
+    Animator _animtor;
+
+    Vector3 _startPosition = Vector3.zero;
+    Vector3 _moveDir = Vector3.zero;
 
     protected sealed override void AISetting(ILog log)
     {
         _log = log.CreateLogger(this);
         _log.Message("AI 셋팅");
 
+        _animtor = GetComponent<Animator>();
+
+        _startPosition = transform.position;
+
         base.AISetting(log);
+
+        Kind = ObjectKind.Enemy;
+        MyStats.CurHP = MyStats.MaxHP = 100;
+        MyStats.Radius = 5f;
+        MyStats.MoveSpeed = 5f;
+        MyStats.IsPatrol = false;
     }
 
     protected sealed override void IdleEvent()
@@ -22,6 +37,8 @@ public class AI : AIMachine
         _log.Message("AI Idle");
 
         base.IdleEvent();
+
+        MyStats.State = AIState.Patrol;
     }
 
     protected sealed override void PatrolEvent()
@@ -29,6 +46,16 @@ public class AI : AIMachine
         _log.Message("AI Patrol");
 
         base.PatrolEvent();
+
+        if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius)
+        {
+            MyStats.State = AIState.Track;
+        }
+        else if (!MyStats.IsPatrol)
+        {
+            MyStats.IsPatrol = true;
+            StartCoroutine(PatrolLogic());
+        }
     }
 
     protected sealed override void TrackEvent()
@@ -36,6 +63,45 @@ public class AI : AIMachine
         _log.Message("AI Track");
 
         base.TrackEvent();
+
+        if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius / 2)
+        {
+            MyStats.State = AIState.Attack;
+        }
+        else if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) >= MyStats.Radius * 2f)
+        {
+            StartCoroutine(BackPosition());
+        }
+        else
+        {
+            Vector3 moveVec = Vector3.Lerp(transform.position, targetObj.transform.position, Time.deltaTime);
+            moveVec.y = moveVec.z = 0f; moveVec.Normalize();
+
+            _log.Message("Track : " + moveVec);
+
+            transform.Translate(-moveVec * MyStats.MoveSpeed * Time.deltaTime);
+        }
+    }
+
+    protected sealed override void AttackEvent()
+    {
+        _log.Message("AI Attack");
+
+        base.AttackEvent();
+
+        if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
+        {
+            MyStats.State = AIState.Patrol;
+        }
+    }
+
+    protected sealed override void DeadEvent()
+    {
+        _log.Message("AI Dead");
+
+        base.DeadEvent();
+
+        Destroy(gameObject);
     }
 
     protected sealed override void Callback(GameObject pObj)
@@ -45,17 +111,70 @@ public class AI : AIMachine
         base.Callback(pObj);
     }
 
-    protected sealed override void AttackEvent()
+    protected override void AnimFrameStart()
     {
-        _log.Message("AI Attack");
-
-        base.AttackEvent();
     }
 
-    protected sealed override void DeadEvent()
+    protected override void AnimFrameUpdate()
     {
-        _log.Message("AI Dead");
+    }
 
-        base.DeadEvent();
+    protected override void AnimFrameEnd()
+    {
+        _animtor.SetBool("isHurt", false);
+    }
+
+    IEnumerator PatrolLogic()
+    {
+        _moveDir = new Vector3(Random.Range(-1f, 1f), 0f, 0f);
+        float progress = 0f;
+        yield return new WaitForSeconds(1f);
+
+        while (MyStats.State == AIState.Patrol && progress <= 1.5f)
+        {
+            _log.Message("2");
+
+            progress += Time.deltaTime;
+            transform.Translate(_moveDir * MyStats.MoveSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        MyStats.IsPatrol = false;
+        yield return new WaitForSeconds(1f);
+    }
+
+    IEnumerator BackPosition()
+    {
+        _log.Message("3");
+
+        float progress = 0f;
+        yield return new WaitForSeconds(1f);
+
+        while (MyStats.State == AIState.Track && progress <= 2.5f)
+        {
+            progress += Time.deltaTime;
+
+            Vector3 moveVec = Vector3.Lerp(transform.position, _startPosition, MyStats.MoveSpeed * Time.deltaTime);
+            moveVec.y = _startPosition.y; moveVec.z = 0f;
+
+            transform.position = moveVec;
+            yield return null;
+        }
+
+        MyStats.State = AIState.Patrol;
+        yield return new WaitForSeconds(1f);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Attack"))
+        {
+            _log.Message("Hit : " + MyStats.CurHP);
+
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            _animtor.SetBool("isHurt", true);
+
+            MyStats.CurHP -= 10;
+        }
     }
 }

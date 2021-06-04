@@ -37,19 +37,11 @@ public class StoneObject : MonoBehaviour
         animator.SetInteger("shakeDir", randDir);
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        if (explosionEnd)
-        {
-            
-            StartCoroutine(CR_StoneErase(1));
-            explosionEnd = false;
-        }
-    }
+    
 
     public void Explosion()
     {
-        if(startEffects != null)
+        if (startEffects != null)
         {
             startEffects.SetActive(true);
         }
@@ -69,8 +61,8 @@ public class StoneObject : MonoBehaviour
         if (gameObject.name == "Tuto_1_Ground_St_12")
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse(new Vector3(3, 3, 3));
-            StartCoroutine(CR_StoneErase(1));
         }
+        StartCoroutine(CR_StoneErase(2));
         explosionEnd = true;
     }
 

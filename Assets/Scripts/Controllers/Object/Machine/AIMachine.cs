@@ -59,6 +59,11 @@ namespace UDBase.Controllers.ObjectSystem
             public bool IsTrack { get; set; }
 
             /// <summary>
+            /// 현재 정찰중인가 ?
+            /// </summary>
+            public bool IsPatrol { get; set; }
+
+            /// <summary>
             /// 현재 대화중인가 ?
             /// </summary>
             public bool IsTalk { get; set; }
@@ -73,7 +78,7 @@ namespace UDBase.Controllers.ObjectSystem
         public Stats MyStats { get; set; }
         KeySetting aiKey;
 
-        GameObject targetObj = null;
+        protected GameObject targetObj = null;
 
         public bool IsDead()
         {
