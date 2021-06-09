@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
+using Cinemachine;
 
 //일정 범위안에 들어오면 다음맵으로 넘어가게 해주는 포탈 스크립트
 public class MapPortal : MonoBehaviour
@@ -10,6 +11,10 @@ public class MapPortal : MonoBehaviour
     //플레이어 오브젝트
     [Header("Player Object")]
     [SerializeField] private GameObject playerObject = null;
+
+    //인게임 카메라
+    [Header("Ingame Camera")]
+    [SerializeField] private GameObject ingameCamera = null;
 
     //지금 포탈 오브젝트
     [Header("Now Portal Object")]
@@ -71,6 +76,10 @@ public class MapPortal : MonoBehaviour
             nowMapObject.SetActive(false);
             nextMapObject.SetActive(true);
             playerTf.position = nextMapStartTf.position;
+            ingameCamera.GetComponent<CinemachineBrain>().enabled = false;
+            ingameCamera.transform.SetPositionAndRotation(nextMapStartTf.position, nextMapStartTf.rotation);
+            ingameCamera.GetComponent<CinemachineBrain>().enabled = true;
+
         }
     }
 }
