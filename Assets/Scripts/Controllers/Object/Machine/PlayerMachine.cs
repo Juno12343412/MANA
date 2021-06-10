@@ -134,8 +134,6 @@ namespace UDBase.Controllers.ObjectSystem {
         /// </summary>
         protected virtual void PlayerSetting(ILog log) {
 
-            Debug.Log("IN");
-
             _player._stats = new PlayerManager.Stats();
             playerKeys = new Dictionary<string, KeySetting>();
 
@@ -160,7 +158,7 @@ namespace UDBase.Controllers.ObjectSystem {
         /// </summary>
         protected virtual void IdleEvent() {
 
-            _player._stats.IsAttack = false;
+            //_player._stats.IsAttack = false;
             _player._stats.IsSpecialAttack = false;
             _player._stats.IsMove = false;
 

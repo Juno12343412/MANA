@@ -72,7 +72,6 @@ public class Player : PlayerMachine
 
                 _renderer.flipX = x == 1 ? false : true;
 
-                _log.Message("Velocity1 : " + _rigid2D.velocity);
                 _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
 
                 if (_rigid2D.velocity.x > _player._stats.MoveSpeed)
@@ -126,14 +125,14 @@ public class Player : PlayerMachine
     {
         base.AttackEvent();
 
-        if (!isStart)
+        if (!isStart && _player._stats.IsAttack)
             return;
 
         _player._stats.IsAttack = true;
         _attackColiders[0].gameObject.SetActive(true);
 
         _animtor.SetBool("isAttack", true);
-        _animtor.SetFloat("Attack", _comboGauge);
+        //_animtor.SetFloat("Attack", _comboGauge);
 
         StartCoroutine(GetKeyTime());
     }
@@ -162,6 +161,7 @@ public class Player : PlayerMachine
 
     IEnumerator Combo(float time = 0f)
     {
+        bool  attack = false;
         float progress = 0f;
         yield return null;
 
@@ -173,19 +173,23 @@ public class Player : PlayerMachine
                 // ...
                 _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-                if (Input.GetKeyDown(KeyCode.Z))
+                if (Input.GetKeyDown(KeyCode.Z) && _player._stats.IsAttack)
                 {
                     _animtor.SetFloat("AttackY", _attackDir.y);
-
-                    if (_comboGauge != 2)
-                        _comboGauge++;
-                    else
-                        _comboGauge = 0;
+                    attack = true;
                     break;
                 }
             }
             progress += Time.deltaTime;
             yield return null;
+        }
+        if (attack)
+        {
+            if (_comboGauge != 2)
+                _comboGauge++;
+            else
+                _comboGauge = 0;
+            _animtor.SetFloat("Attack", _comboGauge);
         }
     }
 
@@ -222,7 +226,7 @@ public class Player : PlayerMachine
         {
             if (Input.anyKeyDown)
             {
-                StartCoroutine(Combo(1f));
+                StartCoroutine(Combo(2f));
                 break;
             }
             progress += Time.deltaTime;
@@ -247,6 +251,7 @@ public class Player : PlayerMachine
 
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
+                _log.Message("rid : " + _rigid2D.velocity.y);
                 _rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
                 _renderer.sprite = _upImg;
 
@@ -265,7 +270,7 @@ public class Player : PlayerMachine
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (!isStart)
+        if (!isStart && _rigid2D.velocity.y != 0)
             return;
 
         _animtor.SetInteger("Jump", 0);

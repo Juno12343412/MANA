@@ -99,8 +99,6 @@ namespace UDBase.Controllers.ObjectSystem
         [Inject]
         public void Init(Stats stats, ILog log)
         {
-            Debug.Log("Init");
-
             _stats = stats;
             _log = log;
         }

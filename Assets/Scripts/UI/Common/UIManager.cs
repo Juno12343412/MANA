@@ -37,7 +37,6 @@ namespace UDBase.UI.Common {
 		/// </summary>
 		[Inject]
         public void Init(Settings settings, ILog log) {
-			Debug.Log("Init");
 
 			_settings = settings;
 			_log	  = log;

@@ -115,8 +115,6 @@ namespace UDBase.UI.Common {
         [Inject]
         public void Init(IEvent events)
         {
-            Debug.Log(gameObject.name + "하이오");
-
             _events = events;
             if ( HasChilds ) { 
                 for ( int i = 0; i < Childs.Count; i++ ) {

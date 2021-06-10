@@ -29,7 +29,6 @@ public class PlayerUI : UIElement
 
     void LateUpdate()
     {
-        Debug.Log(_player._stats.SpecialAttackDuration);
         if (_player != null)
         {
 

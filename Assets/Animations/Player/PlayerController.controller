@@ -145,26 +145,26 @@ BlendTree:
   m_Name: Attack
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 4fb043a2fc4115844998d089da1c9103, type: 2}
+    m_Motion: {fileID: 7400000, guid: 7a27c7718e6e24c42a0cdd37049419b3, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 2.5
+    m_TimeScale: 2
     m_CycleOffset: 0
     m_DirectBlendParameter: Attack
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: ecadcbc4c65ebcf4d8e604d0648b26fa, type: 2}
+    m_Motion: {fileID: 7400000, guid: e71b4f6a35a714a46a8de000c6b2df64, type: 2}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 2.5
+    m_TimeScale: 2
     m_CycleOffset: 0
     m_DirectBlendParameter: Attack
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: bb311acfe5550ee439967642032333d7, type: 2}
+    m_Motion: {fileID: 7400000, guid: db29d20b98fb73b4ab25f5b576d69854, type: 2}
     m_Threshold: 2
     m_Position: {x: 0, y: 0}
-    m_TimeScale: 2.5
+    m_TimeScale: 2
     m_CycleOffset: 0
     m_DirectBlendParameter: Attack
     m_Mirror: 0
@@ -352,37 +352,37 @@ AnimatorController:
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Jump
     m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isAttack
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: Attack
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: AttackY
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   - m_Name: isStart
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 0}
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -556,7 +556,7 @@ BlendTree:
   m_Name: Blend Tree
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 4eb02458308b61f4fbc654426abe35d8, type: 2}
+    m_Motion: {fileID: 7400000, guid: 23fa435079a49324290fac5a72324eff, type: 2}
     m_Threshold: -1
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -564,7 +564,7 @@ BlendTree:
     m_DirectBlendParameter: Attack
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 209f1547a27fd7243a99fbbb7c88ff86, type: 2}
+    m_Motion: {fileID: 7400000, guid: c511e454109d9c143a0251305406a2ba, type: 2}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -572,7 +572,7 @@ BlendTree:
     m_DirectBlendParameter: Attack
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 69a77f9d589cbb4459af98961c2979be, type: 2}
+    m_Motion: {fileID: 7400000, guid: 68a8dfc6fcaa189429e08a35eafcd01d, type: 2}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1

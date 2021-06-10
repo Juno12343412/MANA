@@ -44,17 +44,17 @@ namespace UDBase.Controllers.EventSystem {
 			if( handler != null ) {
 				handler.Fire(arg);
 			}
-		#if !ENABLE_IL2CPP
-			_log.MessageFormat("Fire: {0}", arg);
-		#endif
+		//#if !ENABLE_IL2CPP
+		//	_log.MessageFormat("Fire: {0}", arg);
+		//#endif
 		}
 
 		public void Subscribe<T>(object handler, Action<T> callback) {
 			var eventHandler = GetOrCreateHandler<T>();
 			eventHandler.Subscribe(handler, callback);
-		#if !ENABLE_IL2CPP
-			_log.MessageFormat("Subscribe: {0} for {1}", typeof(T), handler);
-		#endif
+		//#if !ENABLE_IL2CPP
+		//	_log.MessageFormat("Subscribe: {0} for {1}", typeof(T), handler);
+		//#endif
 		}
 
 		public void Unsubscribe<T>(Action<T> action) {
@@ -62,9 +62,9 @@ namespace UDBase.Controllers.EventSystem {
 			if( handler != null ) {
 				handler.Unsubscribe(action);
 			}
-		#if !ENABLE_IL2CPP
-			_log.MessageFormat("Unsubscribe: {0}", typeof(T));
-		#endif
+		//#if !ENABLE_IL2CPP
+		//	_log.MessageFormat("Unsubscribe: {0}", typeof(T));
+		//#endif
 		}
 	
 		/// <summary>
