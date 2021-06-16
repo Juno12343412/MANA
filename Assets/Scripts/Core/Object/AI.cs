@@ -10,6 +10,10 @@ public class AI : AIMachine
 {
     ULogger _log;
     Animator _animtor;
+    SpriteRenderer _renderer;
+    Rigidbody2D _rigid;
+
+    [SerializeField] private GameObject _attackCollider;
 
     Vector3 _startPosition = Vector3.zero;
     Vector3 _moveDir = Vector3.zero;
@@ -20,7 +24,9 @@ public class AI : AIMachine
         _log.Message("AI 셋팅");
 
         _animtor = GetComponent<Animator>();
-
+        _renderer = GetComponent<SpriteRenderer>();
+        _rigid = GetComponent<Rigidbody2D>();
+            
         _startPosition = transform.position;
 
         base.AISetting(log);
@@ -49,6 +55,8 @@ public class AI : AIMachine
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius)
         {
+            _rigid.velocity = Vector2.zero;
+
             MyStats.State = AIState.Track;
         }
         else if (!MyStats.IsPatrol)
@@ -66,6 +74,8 @@ public class AI : AIMachine
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius / 2)
         {
+            _rigid.velocity = Vector2.zero;
+
             MyStats.State = AIState.Attack;
         }
         else if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) >= MyStats.Radius * 2f)
@@ -74,12 +84,25 @@ public class AI : AIMachine
         }
         else
         {
-            Vector3 moveVec = Vector3.Lerp(transform.position, targetObj.transform.position, Time.deltaTime);
-            moveVec.y = moveVec.z = 0f; moveVec.Normalize();
+            Vector3 moveVec = Vector3.zero;
+
+            if (targetObj.transform.position.x < transform.position.x)
+            {
+                moveVec = Vector3.left;
+                _renderer.flipX = false;
+
+            }
+            else if (targetObj.transform.position.x > transform.position.x)
+            {
+                moveVec = Vector3.right;
+                _renderer.flipX = true;
+            }
 
             _log.Message("Track : " + moveVec);
 
-            transform.Translate(-moveVec * MyStats.MoveSpeed * Time.deltaTime);
+            _attackCollider.GetComponent<BoxCollider2D>().offset = new Vector2(moveVec.x, 0);
+
+            transform.position += moveVec * MyStats.MoveSpeed * Time.deltaTime;
         }
     }
 
@@ -91,7 +114,15 @@ public class AI : AIMachine
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
         {
+            _rigid.velocity = Vector2.zero;
+            MyStats.IsAttack = false;
+
             MyStats.State = AIState.Patrol;
+        }
+        else if (!MyStats.IsAttack)
+        {
+            MyStats.IsAttack = true;
+            StartCoroutine("AttackLogic");
         }
     }
 
@@ -132,10 +163,15 @@ public class AI : AIMachine
 
         while (MyStats.State == AIState.Patrol && progress <= 1.5f)
         {
-            _log.Message("2");
-
             progress += Time.deltaTime;
-            transform.Translate(_moveDir * MyStats.MoveSpeed * Time.deltaTime);
+
+            if (_moveDir.x <= 0)
+                _renderer.flipX = false;
+            else
+                _renderer.flipX = true;
+
+            transform.position += _moveDir * MyStats.MoveSpeed * Time.deltaTime;
+
             yield return null;
         }
 
@@ -143,9 +179,19 @@ public class AI : AIMachine
         yield return new WaitForSeconds(1f);
     }
 
+    IEnumerator AttackLogic()
+    {
+        yield return new WaitForSeconds(1f);
+        _attackCollider.SetActive(true);
+        yield return new WaitForSeconds(0.25f);
+        _attackCollider.SetActive(false);
+        yield return new WaitForSeconds(1.5f);
+        MyStats.IsAttack = false;
+    }
+
     IEnumerator BackPosition()
     {
-        _log.Message("3");
+        _rigid.velocity = Vector2.zero;
 
         float progress = 0f;
         yield return new WaitForSeconds(1f);
@@ -173,6 +219,7 @@ public class AI : AIMachine
 
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
             _animtor.SetBool("isHurt", true);
+            _attackCollider.SetActive(false);
 
             MyStats.CurHP -= 10;
         }

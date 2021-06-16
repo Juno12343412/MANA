@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
+using Cinemachine;
 using MANA.Enums;
 
 public class Player : PlayerMachine
@@ -72,7 +73,11 @@ public class Player : PlayerMachine
 
                 _renderer.flipX = x == 1 ? false : true;
 
+                _attackColiders[0].GetComponent<BoxCollider2D>().offset = new Vector2(x, 0);
+
                 _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
+
+                _attackDir.x = x;
 
                 if (_rigid2D.velocity.x > _player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(_player._stats.MoveSpeed, _rigid2D.velocity.y);
@@ -215,6 +220,7 @@ public class Player : PlayerMachine
             _animtor.SetBool("isAttack", false);
             _animtor.SetFloat("Attack", 0);
             _animtor.SetInteger("AttackY", 0);
+            _animtor.SetBool("isHurt", false);
         }
     }
 
@@ -275,6 +281,15 @@ public class Player : PlayerMachine
 
         _animtor.SetInteger("Jump", 0);
         _player._stats.IsJump = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("EnemyAttack") && !_animtor.GetBool("isHurt"))
+        {
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            _animtor.SetBool("isHurt", true);
+        }
     }
 
     void StartEvent()

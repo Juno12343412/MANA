@@ -64,6 +64,11 @@ namespace UDBase.Controllers.ObjectSystem
             public bool IsPatrol { get; set; }
 
             /// <summary>
+            /// 현재 공격중인가 ?
+            /// </summary>
+            public bool IsAttack { get; set; }
+
+            /// <summary>
             /// 현재 대화중인가 ?
             /// </summary>
             public bool IsTalk { get; set; }
