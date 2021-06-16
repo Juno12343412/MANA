@@ -21,7 +21,6 @@ public class AI : AIMachine
     protected sealed override void AISetting(ILog log)
     {
         _log = log.CreateLogger(this);
-        _log.Message("AI 셋팅");
 
         _animtor = GetComponent<Animator>();
         _renderer = GetComponent<SpriteRenderer>();
@@ -40,7 +39,6 @@ public class AI : AIMachine
 
     protected sealed override void IdleEvent()
     {
-        _log.Message("AI Idle");
 
         base.IdleEvent();
 
@@ -49,7 +47,6 @@ public class AI : AIMachine
 
     protected sealed override void PatrolEvent()
     {
-        _log.Message("AI Patrol");
 
         base.PatrolEvent();
 
@@ -68,7 +65,6 @@ public class AI : AIMachine
 
     protected sealed override void TrackEvent()
     {
-        _log.Message("AI Track");
 
         base.TrackEvent();
 
@@ -98,7 +94,6 @@ public class AI : AIMachine
                 _renderer.flipX = true;
             }
 
-            _log.Message("Track : " + moveVec);
 
             _attackCollider.GetComponent<BoxCollider2D>().offset = new Vector2(moveVec.x, 0);
 
@@ -108,7 +103,6 @@ public class AI : AIMachine
 
     protected sealed override void AttackEvent()
     {
-        _log.Message("AI Attack");
 
         base.AttackEvent();
 
@@ -128,7 +122,6 @@ public class AI : AIMachine
 
     protected sealed override void DeadEvent()
     {
-        _log.Message("AI Dead");
 
         base.DeadEvent();
 
@@ -137,7 +130,6 @@ public class AI : AIMachine
 
     protected sealed override void Callback(GameObject pObj)
     {
-        _log.Message("AI Callback");
 
         base.Callback(pObj);
     }
@@ -215,7 +207,6 @@ public class AI : AIMachine
     {
         if (other.gameObject.CompareTag("Attack"))
         {
-            _log.Message("Hit : " + MyStats.CurHP);
 
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
             _animtor.SetBool("isHurt", true);

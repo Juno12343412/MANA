@@ -37,7 +37,7 @@ public class StoneObject : MonoBehaviour
         animator.SetInteger("shakeDir", randDir);
     }
 
-    
+
 
     public void Explosion()
     {
@@ -46,13 +46,12 @@ public class StoneObject : MonoBehaviour
             startEffects.SetActive(true);
         }
         stoneRig.constraints = RigidbodyConstraints2D.None;
-        Vector3 distance = playerPos.position - transform.position;
-        float distanceF = Vector3.Distance(playerPos.position, transform.position);
-        distanceF = distanceF >= forcePower ? forcePower : distanceF;
+        Vector3 distance = transform.position - playerPos.position;
         distance = Vector3.Normalize(distance);
-        distance.y = distance.y < 0 ? 0 : distance.y;
+        distance.y = distance.y < 0 ? 0.3f : distance.y;
 
-        stoneRig.AddForce(-distance * (forcePower * 5 / distanceF), ForceMode2D.Impulse);
+
+        stoneRig.AddForce(distance * forcePower, ForceMode2D.Impulse);
         animator.SetBool("isStart", true);
         for (int i = 0; i < startLights.Length; i++)
         {

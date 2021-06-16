@@ -81,8 +81,8 @@ public class BackgroundMove : MonoBehaviour
             for (int i = 0; i < far_Resource.Length; i++)
             {
                 float x = cameraT.position.x + (farFirst[i].x - cameraT.position.x) * far_MoveSpeed;
-                farTf[i].position = Vector3.Lerp(farTf[i].position, new Vector3(x, farTf[i].position.y, 0), Time.deltaTime);
-
+                //farTf[i].position = Vector3.Lerp(farTf[i].position, new Vector3(x, farTf[i].position.y, 0), Time.deltaTime);
+                farTf[i].position = new Vector3(x, farTf[i].position.y, 0);
             }
         }
         if (mid_Resource.Length > 0)
@@ -91,7 +91,8 @@ public class BackgroundMove : MonoBehaviour
             {
                 float x = cameraT.position.x + (midFirst[i].x - cameraT.position.x) * mid_MoveSpeed;
 
-                midTf[i].position = Vector3.Lerp(midTf[i].position, new Vector3(x, midTf[i].position.y, 0), Time.deltaTime);
+                //midTf[i].position = Vector3.Lerp(midTf[i].position, new Vector3(x, midTf[i].position.y, 0), Time.deltaTime);
+                midTf[i].position = new Vector3(x, midTf[i].position.y, 0);
             }
         }
         if (near_Resource.Length > 0)
@@ -99,8 +100,8 @@ public class BackgroundMove : MonoBehaviour
             for (int i = 0; i < near_Resource.Length; i++)
             {
                 float x = cameraT.position.x + (nearFirst[i].x - cameraT.position.x) * near_MoveSpeed;
-                nearTf[i].position = Vector3.Lerp(nearTf[i].position, new Vector3(x, nearTf[i].position.y, 0), Time.deltaTime);
-
+                //nearTf[i].position = Vector3.Lerp(nearTf[i].position, new Vector3(x, nearTf[i].position.y, 0), Time.deltaTime);
+                nearTf[i].position = new Vector3(x, nearTf[i].position.y, 0);
             }
         }
     }

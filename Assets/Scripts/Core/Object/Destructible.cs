@@ -22,7 +22,6 @@ public class Destructible : AIMachine
     protected sealed override void AISetting(ILog log)
     {
         _log = log.CreateLogger(this);
-        _log.Message("AI 셋팅");
 
         _animtor = GetComponent<Animator>();
 
@@ -40,7 +39,6 @@ public class Destructible : AIMachine
     {
         if (other.gameObject.CompareTag("Attack"))
         {
-            _log.Message(kind.ToString() + " Hit : " + MyStats.CurHP);
 
             if(kind != DestructKind.Grass)
                 GetComponent<CinemachineImpulseSource>().GenerateImpulse();

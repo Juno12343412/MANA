@@ -257,7 +257,6 @@ public class Player : PlayerMachine
 
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
-                _log.Message("rid : " + _rigid2D.velocity.y);
                 _rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
                 _renderer.sprite = _upImg;
 
