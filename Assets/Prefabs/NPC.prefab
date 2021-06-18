@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3986553818521570811}
   - component: {fileID: 3986553818521570808}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: LeftArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3986553818522312313}
   - component: {fileID: 3986553818522312326}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Interaction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,7 +175,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3986553819009855389}
   - component: {fileID: 3986553819009855386}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -256,7 +256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3986553819238260979}
   - component: {fileID: 3986553819238260976}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: RightArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 3986553820206273970}
   - component: {fileID: 3986553820206273968}
   - component: {fileID: 3986553820206273971}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5154,9 +5154,9 @@ GameObject:
   - component: {fileID: 3986553820519557552}
   - component: {fileID: 3986553820519557566}
   - component: {fileID: 3986553820519557553}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: NPC
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

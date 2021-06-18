@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
+using UDBase.Utils;
 using Cinemachine;
 using MANA.Enums;
 
@@ -14,9 +16,11 @@ public class AI : AIMachine
     Rigidbody2D _rigid;
 
     [SerializeField] private GameObject _attackCollider;
+    [SerializeField] private GameObject _particle;
 
     Vector3 _startPosition = Vector3.zero;
     Vector3 _moveDir = Vector3.zero;
+    Vector3 _hurtDir = Vector3.zero;
 
     protected sealed override void AISetting(ILog log)
     {
@@ -93,7 +97,7 @@ public class AI : AIMachine
                 moveVec = Vector3.right;
                 _renderer.flipX = true;
             }
-
+            _hurtDir = moveVec;
 
             _attackCollider.GetComponent<BoxCollider2D>().offset = new Vector2(moveVec.x, 0);
 
@@ -103,14 +107,11 @@ public class AI : AIMachine
 
     protected sealed override void AttackEvent()
     {
-
         base.AttackEvent();
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
         {
             _rigid.velocity = Vector2.zero;
-            MyStats.IsAttack = false;
-
             MyStats.State = AIState.Patrol;
         }
         else if (!MyStats.IsAttack)
@@ -136,6 +137,7 @@ public class AI : AIMachine
 
     protected override void AnimFrameStart()
     {
+        _particle.SetActive(true);
     }
 
     protected override void AnimFrameUpdate()
@@ -145,6 +147,7 @@ public class AI : AIMachine
     protected override void AnimFrameEnd()
     {
         _animtor.SetBool("isHurt", false);
+        _particle.SetActive(false);
     }
 
     IEnumerator PatrolLogic()
@@ -173,12 +176,15 @@ public class AI : AIMachine
 
     IEnumerator AttackLogic()
     {
-        yield return new WaitForSeconds(1f);
-        _attackCollider.SetActive(true);
-        yield return new WaitForSeconds(0.25f);
-        _attackCollider.SetActive(false);
-        yield return new WaitForSeconds(1.5f);
-        MyStats.IsAttack = false;
+        if (MyStats.IsAttack)
+        {
+            yield return new WaitForSeconds(1f);
+            _attackCollider.SetActive(true);
+            yield return new WaitForSeconds(0.05f);
+            _attackCollider.SetActive(false);
+            yield return new WaitForSeconds(2.5f);
+            MyStats.IsAttack = false;
+        }
     }
 
     IEnumerator BackPosition()
@@ -207,12 +213,19 @@ public class AI : AIMachine
     {
         if (other.gameObject.CompareTag("Attack"))
         {
-
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+
+            Debug.Log(_moveDir);
+
+            _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * 10f, ForceMode2D.Impulse);
             _animtor.SetBool("isHurt", true);
             _attackCollider.SetActive(false);
+            MyStats.IsAttack = false;
 
             MyStats.CurHP -= 10;
+
+            if (!IsDead())
+                StartCoroutine(TimeUtils.TimeStop(0.05f));
         }
     }
 }

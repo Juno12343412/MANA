@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - Attack
   - EnemyAttack
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -27,8 +28,8 @@ TagManager:
   - Far
   - Mid
   - Near
-  - 
-  - 
+  - Enemy
+  - EnemyAttack
   - 
   - 
   - 

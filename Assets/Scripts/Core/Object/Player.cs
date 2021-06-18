@@ -134,12 +134,8 @@ public class Player : PlayerMachine
             return;
 
         _player._stats.IsAttack = true;
-        _attackColiders[0].gameObject.SetActive(true);
 
         _animtor.SetBool("isAttack", true);
-        //_animtor.SetFloat("Attack", _comboGauge);
-
-        StartCoroutine(GetKeyTime());
     }
 
     protected sealed override void SpecialAttackEvent()
@@ -178,7 +174,7 @@ public class Player : PlayerMachine
                 // ...
                 _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-                if (Input.GetKeyDown(KeyCode.Z) && _player._stats.IsAttack)
+                if ((Input.GetKeyDown(KeyCode.Z) || Input.GetKey(KeyCode.Z)) && _player._stats.IsAttack)
                 {
                     _animtor.SetFloat("AttackY", _attackDir.y);
                     attack = true;
@@ -198,6 +194,11 @@ public class Player : PlayerMachine
         }
     }
 
+    public void AnimComboEvent()
+    {
+        StartCoroutine(Combo(1f));
+    }
+
     protected override void AnimFrameStart()
     {
 
@@ -205,7 +206,7 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameUpdate()
     {
-
+        _attackColiders[0].gameObject.SetActive(true);
     }
 
     protected override void AnimFrameEnd()
@@ -224,22 +225,6 @@ public class Player : PlayerMachine
         }
     }
 
-    IEnumerator GetKeyTime(float time = 1f, PlayerState state = PlayerState.NONE)
-    {
-        float progress = 0f;
-
-        while (progress <= time)
-        {
-            if (Input.anyKeyDown)
-            {
-                StartCoroutine(Combo(2f));
-                break;
-            }
-            progress += Time.deltaTime;
-            yield return null;
-        }
-    }
-
     IEnumerator GetJumpForce(float time = 1f)
     {
         // 점프 로직
@@ -247,18 +232,15 @@ public class Player : PlayerMachine
 
         _animtor.SetInteger("Jump", 1);
         _renderer.sprite = _upImg;
-        _rigid2D.velocity = new Vector2(_rigid2D.velocity.x, _player._stats.JumpPower);
-
-        StartCoroutine(GetKeyTime(1f, _player._stats.State));
+        _rigid2D.AddForce(Vector3.up * _player._stats.JumpPower, ForceMode2D.Impulse);
 
         while (progress <= time)
         {
-            _renderer.sprite = _upImg;
-
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
-                _rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
-                _renderer.sprite = _upImg;
+                //_rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
+                _rigid2D.AddForce(Vector2.up * _player._stats.JumpPower * Time.deltaTime, ForceMode2D.Impulse);
+                //_renderer.sprite = _upImg;
 
                 progress += Time.deltaTime;
                 yield return null;
@@ -270,7 +252,6 @@ public class Player : PlayerMachine
             }
         }
         _animtor.SetInteger("Jump", 2);
-        StartCoroutine(GetKeyTime(1, _player._stats.State));
     }
 
     void OnCollisionEnter2D(Collision2D other)
@@ -287,6 +268,8 @@ public class Player : PlayerMachine
         if (other.gameObject.CompareTag("EnemyAttack") && !_animtor.GetBool("isHurt"))
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            _rigid2D.AddForce(new Vector2(-_attackDir.x, 0f) * 10f, ForceMode2D.Impulse);
+
             _animtor.SetBool("isHurt", true);
         }
     }
