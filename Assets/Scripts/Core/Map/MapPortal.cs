@@ -25,8 +25,7 @@ public class MapPortal : MonoBehaviour
     [SerializeField] private GameObject nowMapObject = null;
     [Header("Next Map Object")]
     [SerializeField] private GameObject nextMapObject = null;
-    [Header("Next Map Start Tf")]
-    [SerializeField] private Transform nextMapStartTf = null;
+   
 
     //포탈 밝기 동작 범위
     [Header("Max Portal Glow")]
@@ -75,10 +74,7 @@ public class MapPortal : MonoBehaviour
             sceneChangefade.GetComponent<Animator>().SetTrigger("SceneChange");
             nowMapObject.SetActive(false);
             nextMapObject.SetActive(true);
-            playerTf.position = nextMapStartTf.position;
-            ingameCamera.GetComponent<CinemachineBrain>().enabled = false;
-            ingameCamera.transform.SetPositionAndRotation(nextMapStartTf.position, nextMapStartTf.rotation);
-            ingameCamera.GetComponent<CinemachineBrain>().enabled = true;
+            
 
         }
     }

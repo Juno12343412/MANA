@@ -15,6 +15,7 @@ public class Destructible : AIMachine
     [SerializeField] private DestructKind kind;
     [SerializeField] private GameObject particle;
     [SerializeField] private float maxHp;
+    [SerializeField] private GameObject reward;
     private float dir = 0.0f;
 
     ObjectPool<Particle> particlePool = new ObjectPool<Particle>();
@@ -69,6 +70,8 @@ public class Destructible : AIMachine
             MyStats.CurHP -= 1;
             if(MyStats.CurHP <= 0)
             {
+                if (reward != null)
+                    reward.SetActive(true);
                 Dead(other.gameObject);
             }
         }
