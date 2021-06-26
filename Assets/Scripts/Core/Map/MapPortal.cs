@@ -27,13 +27,12 @@ public class MapPortal : MonoBehaviour
     [SerializeField] private GameObject nextMapObject = null;
    
 
-    //포탈 밝기 동작 범위
     [Header("Max Portal Glow")]
-    [SerializeField] [Range(0,30.0f)] private float inPortalDistance = 10;
+    [SerializeField] [Range(0,500.0f)] private float maxGlow = 10;
 
     //기본 포탈 밝기
     [Header("Deafult Portal Glow")]
-    [SerializeField] [Range(0,30.0f)] private float deafultPortalGlow = 10;
+    [SerializeField] [Range(0,500.0f)] private float deafultPortalGlow = 10;
 
 
     #endregion
@@ -57,9 +56,9 @@ public class MapPortal : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(playerTf.position, nowPortalTf.position) <= inPortalDistance) // 일정 거리 안에 들어오면 포탈 빛 점점 밝아지는 곳
+        if (Vector3.Distance(playerTf.position, nowPortalTf.position) <= 15) // 일정 거리 안에 들어오면 포탈 빛 점점 밝아지는 곳
         {
-            portalLight.intensity = (inPortalDistance + deafultPortalGlow) - Vector3.Distance(playerTf.position, nowPortalTf.position);
+            portalLight.intensity = deafultPortalGlow + maxGlow - (Vector3.Distance(playerTf.position, nowPortalTf.position) / 15) * maxGlow;
         }
         else // 기본 포탈 밝기 
         {
@@ -74,8 +73,6 @@ public class MapPortal : MonoBehaviour
             sceneChangefade.GetComponent<Animator>().SetTrigger("SceneChange");
             nowMapObject.SetActive(false);
             nextMapObject.SetActive(true);
-            
-
         }
     }
 }

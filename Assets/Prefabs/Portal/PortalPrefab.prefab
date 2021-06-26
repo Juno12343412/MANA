@@ -46,10 +46,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerObject: {fileID: 0}
+  ingameCamera: {fileID: 0}
   nowPortalObject: {fileID: 6848047548183735759}
   nowMapObject: {fileID: 0}
   nextMapObject: {fileID: 0}
-  nextMapStartTf: {fileID: 0}
   inPortalDistance: 6
   deafultPortalGlow: 1.5
 --- !u!114 &6848047548183735600
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_LightVolumeOpacity: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: b1c2cb787388085300000000f3048d1d61004572
   m_LightCookieSprite: {fileID: 0}
   m_UseNormalMap: 0
   m_LightOrder: 0

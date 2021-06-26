@@ -10,6 +10,7 @@ TagManager:
   - Attack
   - EnemyAttack
   - Enemy
+  - Wreck
   layers:
   - Default
   - TransparentFX
@@ -30,7 +31,7 @@ TagManager:
   - Near
   - Enemy
   - EnemyAttack
-  - 
+  - Wreck
   - 
   - 
   - 
