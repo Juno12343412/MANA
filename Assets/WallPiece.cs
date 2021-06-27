@@ -14,7 +14,7 @@ public class WallPiece : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        GetComponent<Rigidbody2D>().AddForce(dir * 10.0f, ForceMode2D.Impulse);
+        GetComponent<Rigidbody2D>().AddForce(-dir * 20.0f, ForceMode2D.Impulse);
         StartCoroutine(CR_Erase(1.5f));
     }
 

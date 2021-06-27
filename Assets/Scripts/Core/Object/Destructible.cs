@@ -62,25 +62,26 @@ public class Destructible : AIMachine
         for (int i = 0; i < wallPiece.Length; i++)
         {
             wallPiece[i].SetActive(true);
-            switch (obj.gameObject.GetComponentInParent<Player>()._attackDir)
-            {
-                case Vector2 v when v.Equals(Vector2.left):
-                    wallPieceDir = new Vector2(-1, 0);
-                    break;
-                case Vector2 v when v.Equals(Vector2.right):
-                    wallPieceDir = new Vector2(1, 0);
+            //switch (obj.gameObject.GetComponentInParent<Player>()._attackDir)
+            //{
+            //    case Vector2 v when v.Equals(Vector2.left):
+            //        wallPieceDir = new Vector2(-1, 0);
+            //        break;
+            //    case Vector2 v when v.Equals(Vector2.right):
+            //        wallPieceDir = new Vector2(1, 0);
 
-                    break;
-                case Vector2 v when v.Equals(Vector2.up):
-                    wallPieceDir = new Vector2(0, 1);
+            //        break;
+            //    case Vector2 v when v.Equals(Vector2.up):
+            //        wallPieceDir = new Vector2(0, 1);
 
-                    break;
-                case Vector2 v when v.Equals(Vector2.down):
-                    wallPieceDir = new Vector2(0, -1);
-                    break;
-            }
-            //wallPieceDir = obj.transform.position - wallPiece[i].transform.position;
-            //Vector3.Normalize(wallPieceDir);
+            //        break;
+            //    case Vector2 v when v.Equals(Vector2.down):
+            //        wallPieceDir = new Vector2(0, -1);
+            //        break;
+            //}
+            wallPieceDir = new Vector3(obj.transform.position.x, transform.position.y,0) - wallPiece[i].transform.position;
+            Vector3.Normalize(wallPieceDir);
+            wallPieceDir = new Vector2(wallPieceDir.x * 2, wallPieceDir.y);
             //float length = Vector3.Distance(transform.position, wallPiece[i].transform.position);
             wallPiece[i].GetComponent<WallPiece>().BreakWall(wallPieceDir);
         }
@@ -95,10 +96,12 @@ public class Destructible : AIMachine
         float time = temp;
         while (time > 0)
         {
-            float randPosX = Random.Range(0, 2);
-            randPosX = randPosX == 0 ? -0.07f : 0.07f;
-            float randPosY = Random.Range(0, 2);
-            randPosY = randPosY == 0 ? -0.05f : 0.05f;
+            //float randPosX = Random.Range(0, 2);
+            //randPosX = randPosX == 0 ? -0.07f : 0.07f;
+            //float randPosY = Random.Range(0, 2);
+            //randPosY = randPosY == 0 ? -0.05f : 0.05f;
+            float randPosX = Random.Range(-0.07f, 0.07f);
+            float randPosY = Random.Range(-0.05f, 0.05f);
             Vector3 randPos = new Vector3(randPosX, randPosY, 0);
 
             transform.position += randPos;
