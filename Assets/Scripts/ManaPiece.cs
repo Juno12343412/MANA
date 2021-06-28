@@ -10,6 +10,7 @@ public class ManaPiece : MonoBehaviour
     [SerializeField] public float spd = 5;
     [SerializeField] public float posA = 0.55f;
     [SerializeField] public float posB = 0.45f;
+    [SerializeField] public Transform _posA = null;
     public GameObject start;
 
     Vector3 originPos;
@@ -26,7 +27,7 @@ public class ManaPiece : MonoBehaviour
         {
             point[0] = start.transform.position; // P0
             point[1] = PointSetting(start.transform.position); // P1
-            point[2] = PointSetting(transform.position); // P2
+            point[2] = PointSetting(originPos); // P2
             point[3] = originPos; // P3
             transform.position = start.transform.position;
         }
@@ -34,7 +35,7 @@ public class ManaPiece : MonoBehaviour
 
     void Update()
     {
-        if (Vector3.Distance(transform.position , originPos) <= 1)
+        if (Vector3.Distance(transform.position, originPos) <= 1)
         {
             finsh = true;
         }
@@ -68,12 +69,20 @@ public class ManaPiece : MonoBehaviour
     Vector2 PointSetting(Vector2 origin)
     {
         float x, y;
-
-        x = posA * Mathf.Cos(Random.Range(0, 360) * Mathf.Deg2Rad)
-            + origin.x;
-        y = posB * Mathf.Sin(Random.Range(0, 360) * Mathf.Deg2Rad)
+        if (_posA == null)
+        {
+            x = posA * Mathf.Cos(Random.Range(0, 360) * Mathf.Deg2Rad)
+                + origin.x;
+            y = posB * Mathf.Sin(Random.Range(0, 360) * Mathf.Deg2Rad)
             + origin.y;
-        return new Vector2(x, y);
+            return new Vector2(x, y);
+        }
+        else
+        {
+            return new Vector2(_posA.position.x, _posA.position.y);
+        }
+
+        
     }
 
     void DrawTrajectory()
@@ -84,7 +93,7 @@ public class ManaPiece : MonoBehaviour
         );
     }
 
-   
+
 
 
     private float FourPointBezier(float a, float b, float c, float d)

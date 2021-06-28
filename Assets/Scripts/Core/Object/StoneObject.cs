@@ -23,6 +23,17 @@ public class StoneObject : MonoBehaviour
 
     void Start()
     {
+        
+    }
+    IEnumerator CR_StartIntro()
+    {
+        yield return new WaitForSeconds(4.0f);
+        int randDir = Random.Range(0, 2);
+
+        animator.SetInteger("shakeDir", randDir);
+    }
+    public void StartIntro()
+    {
         explosionEnd = false;
         gameObject.SetActive(true);
         stoneRig = gameObject.GetComponent<Rigidbody2D>();
@@ -32,12 +43,8 @@ public class StoneObject : MonoBehaviour
         {
             startLights[i].SetActive(false);
         }
-        int randDir = Random.Range(0, 2); //
-
-        animator.SetInteger("shakeDir", randDir);
+        StartCoroutine(CR_StartIntro());
     }
-
-
 
     public void Explosion()
     {
