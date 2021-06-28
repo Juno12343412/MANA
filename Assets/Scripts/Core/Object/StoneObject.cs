@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using Cinemachine;
+using Zenject;
+using UDBase.UI.Common;
 
 public class StoneObject : MonoBehaviour
 {
@@ -20,12 +22,11 @@ public class StoneObject : MonoBehaviour
     Animator animator;
     bool explosionEnd = false;
     SpriteRenderer sprite;
+
+    [Inject]
+    UIManager _ui;
     #endregion
 
-    void Start()
-    {
-        
-    }
     IEnumerator CR_StartIntro()
     {
         yield return new WaitForSeconds(3.0f);
@@ -33,6 +34,7 @@ public class StoneObject : MonoBehaviour
 
         animator.SetInteger("shakeDir", randDir);
     }
+
     public void StartIntro()
     {
         explosionEnd = false;
@@ -69,8 +71,9 @@ public class StoneObject : MonoBehaviour
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse(new Vector3(3, 3, 3));
         }
-        StartCoroutine(CR_StoneErase(2));
         explosionEnd = true;
+
+        Invoke("WaitStart", 3.5f);
     }
 
     public void StartLight(int num)
@@ -119,5 +122,13 @@ public class StoneObject : MonoBehaviour
         {
             StartCoroutine(CR_CameraShake());
         }
+    }
+
+    void WaitStart()
+    {
+        StartCoroutine(CR_StoneErase(2));
+
+        _ui.Find("BaseUI").GetComponent<Animator>().SetBool("isTalk", false);
+        GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().StartEvent();
     }
 }

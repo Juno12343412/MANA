@@ -24,6 +24,8 @@ public class Player : PlayerMachine
     private Rigidbody2D _rigid2D;
 
     bool isStart = false;
+    bool isDash = false;
+    float _clickTime = 0f;
 
     protected sealed override void PlayerSetting(ILog log)
     {
@@ -35,8 +37,8 @@ public class Player : PlayerMachine
         _player._stats.AttackDuration = _player._stats.AttackDuration = 2;
         _player._stats.SpecialAttackDuration = _player._stats.SpecialAttackDuration = 100;
         _player._stats.AttackSpeed = _player._stats.AttackSpeed = 2;
-        _player._stats.JumpPower = 5;
-        _player._stats.MoveSpeed = 5;
+        _player._stats.JumpPower = 12;
+        _player._stats.MoveSpeed = 7;
 
         _renderer = GetComponent<SpriteRenderer>();
         _rigid2D = GetComponent<Rigidbody2D>();
@@ -44,8 +46,6 @@ public class Player : PlayerMachine
         _animtor.enabled = false;
 
         _renderer.sprite = _startImg;
-
-        Invoke("StartEvent", 5f);
     }
 
     protected sealed override void IdleEvent()
@@ -60,7 +60,10 @@ public class Player : PlayerMachine
 
     protected sealed override void WalkEvent()
     {
-        if (!_player._stats.IsAttack)
+        if (!isStart)
+            return;
+
+        if (!_player._stats.IsAttack && !isDash)
         {
             base.WalkEvent();
 
@@ -75,7 +78,7 @@ public class Player : PlayerMachine
 
                 _attackColiders[0].GetComponent<BoxCollider2D>().offset = new Vector2(x, 0);
 
-                _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.05f;
+                _rigid2D.velocity += new Vector2(x, 0) * _player._stats.MoveSpeed * 0.5f;
 
                 _attackDir.x = x;
 
@@ -83,6 +86,10 @@ public class Player : PlayerMachine
                     _rigid2D.velocity = new Vector2(_player._stats.MoveSpeed, _rigid2D.velocity.y);
                 else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
+
+                if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                    Dash(new Vector2(x, 0));
+                }
             }
             else
             {
@@ -109,7 +116,7 @@ public class Player : PlayerMachine
             return;
 
         // 점프하는 로직
-        if (!_player._stats.IsJump)
+        if (!_player._stats.IsJump && _rigid2D.velocity.y <= 0.1f)
         {
             base.JumpEvent();
 
@@ -162,7 +169,7 @@ public class Player : PlayerMachine
 
     IEnumerator Combo(float time = 0f)
     {
-        bool  attack = false;
+        bool attack = false;
         float progress = 0f;
         yield return null;
 
@@ -196,7 +203,7 @@ public class Player : PlayerMachine
 
     public void AnimComboEvent()
     {
-        StartCoroutine(Combo(1f));
+        StartCoroutine(Combo(0.5f));
     }
 
     protected override void AnimFrameStart()
@@ -211,8 +218,11 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameEnd()
     {
-        if (_animtor.GetBool("isStart"))
+        if (_animtor.GetBool("isStart")) {
+
+            isStart = true;
             _animtor.SetBool("isStart", false);
+        }
         else
         {
             _player._stats.IsAttack = false;
@@ -274,11 +284,28 @@ public class Player : PlayerMachine
         }
     }
 
-    void StartEvent()
+    public void StartEvent()
     {
         isStart = true;
 
         _animtor.enabled = true;
         _animtor.SetBool("isStart", true);
+    }
+
+    void Dash(Vector2 _dir)
+    {
+        Debug.Log("Dash : " + _dir * _player._stats.MoveSpeed * 2f);
+
+        isDash = true;
+
+        GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+        _rigid2D.AddForce(_dir * _player._stats.MoveSpeed * 4f, ForceMode2D.Impulse);
+
+        Invoke("DashEnd", 0.15f);
+    }
+
+    void DashEnd()
+    {
+        isDash = false;
     }
 }

@@ -29,7 +29,7 @@ public class AI : AIMachine
         _animtor = GetComponent<Animator>();
         _renderer = GetComponent<SpriteRenderer>();
         _rigid = GetComponent<Rigidbody2D>();
-            
+
         _startPosition = transform.position;
 
         base.AISetting(log);
@@ -75,6 +75,22 @@ public class AI : AIMachine
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius / 2)
         {
             _rigid.velocity = Vector2.zero;
+            _animtor.SetBool("isMove", false);
+
+            Vector3 moveVec = Vector3.zero;
+
+            if (targetObj.transform.position.x < transform.position.x)
+            {
+                moveVec = Vector3.left;
+                _renderer.flipX = false;
+
+            }
+            else if (targetObj.transform.position.x > transform.position.x)
+            {
+                moveVec = Vector3.right;
+                _renderer.flipX = true;
+            }
+            _hurtDir = moveVec;
 
             MyStats.State = AIState.Attack;
         }
@@ -84,6 +100,9 @@ public class AI : AIMachine
         }
         else
         {
+            if (!_animtor.GetBool("isMove"))
+                _animtor.SetBool("isMove", true);
+
             Vector3 moveVec = Vector3.zero;
 
             if (targetObj.transform.position.x < transform.position.x)
@@ -109,15 +128,18 @@ public class AI : AIMachine
     {
         base.AttackEvent();
 
-        if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
+        if (!MyStats.IsAttack)
         {
-            _rigid.velocity = Vector2.zero;
-            MyStats.State = AIState.Patrol;
-        }
-        else if (!MyStats.IsAttack)
-        {
-            MyStats.IsAttack = true;
-            StartCoroutine("AttackLogic");
+            if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
+            {
+                _rigid.velocity = Vector2.zero;
+                MyStats.State = AIState.Patrol;
+            }
+            else
+            {
+                MyStats.IsAttack = true;
+                StartCoroutine("AttackLogic");
+            }
         }
     }
 
@@ -126,7 +148,13 @@ public class AI : AIMachine
 
         base.DeadEvent();
 
-        Destroy(gameObject);
+        Vector2 _dir = new Vector2(-_hurtDir.x, 5f);
+
+        _rigid.velocity = Vector2.zero;
+        _rigid.AddForce(_dir * MyStats.MoveSpeed / 2f, ForceMode2D.Impulse);
+        GetComponent<BoxCollider2D>().enabled = false;
+
+        StartCoroutine(EnemyErase(3f));
     }
 
     protected sealed override void Callback(GameObject pObj)
@@ -147,6 +175,10 @@ public class AI : AIMachine
     protected override void AnimFrameEnd()
     {
         _animtor.SetBool("isHurt", false);
+
+        if (_animtor.GetBool("isAttack"))
+            _animtor.SetBool("isAttack", false);
+
         _particle.SetActive(false);
     }
 
@@ -158,6 +190,9 @@ public class AI : AIMachine
 
         while (MyStats.State == AIState.Patrol && progress <= 1.5f)
         {
+            if (!_animtor.GetBool("isMove"))
+                _animtor.SetBool("isMove", true);
+
             progress += Time.deltaTime;
 
             if (_moveDir.x <= 0)
@@ -171,6 +206,8 @@ public class AI : AIMachine
         }
 
         MyStats.IsPatrol = false;
+        _animtor.SetBool("isMove", false);
+
         yield return new WaitForSeconds(1f);
     }
 
@@ -179,6 +216,7 @@ public class AI : AIMachine
         if (MyStats.IsAttack)
         {
             yield return new WaitForSeconds(1f);
+            _animtor.SetBool("isAttack", true);
             _attackCollider.SetActive(true);
             yield return new WaitForSeconds(0.05f);
             _attackCollider.SetActive(false);
@@ -209,6 +247,21 @@ public class AI : AIMachine
         yield return new WaitForSeconds(1f);
     }
 
+    IEnumerator EnemyErase(float _time)
+    {
+        yield return new WaitForSeconds(_time);
+        Destroy(gameObject, _time);
+        //float progress = 1f;
+
+        //while (_renderer.color.a > 0.1f)
+        //{
+        //    Debug.Log(progress + " : " + _renderer.color.a);
+        //    _renderer.color = new Color(1f, 1f, 1f, 255f/155f);
+        //    progress -= Time.deltaTime;
+        //    yield return null;
+        //}
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Attack"))
@@ -225,7 +278,9 @@ public class AI : AIMachine
             MyStats.CurHP -= 10;
 
             if (!IsDead())
+            {
                 StartCoroutine(TimeUtils.TimeStop(0.05f));
+            }
         }
     }
 }

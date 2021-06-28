@@ -24,7 +24,7 @@ public class PlayerUI : UIElement
     void Start()
     {
         _player._stats.SpecialAttackDuration = 50;
-        _player._stats.CurHP = 97;
+        _player._stats.CurHP = 100;
     }
 
     void LateUpdate()
