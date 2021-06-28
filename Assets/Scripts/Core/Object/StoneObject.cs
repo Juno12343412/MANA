@@ -11,6 +11,7 @@ public class StoneObject : MonoBehaviour
     [SerializeField] Transform playerPos;
     [SerializeField] GameObject[] startLights;
     [SerializeField] GameObject startEffects;
+    
 
     #endregion
 
@@ -27,7 +28,7 @@ public class StoneObject : MonoBehaviour
     }
     IEnumerator CR_StartIntro()
     {
-        yield return new WaitForSeconds(4.0f);
+        yield return new WaitForSeconds(3.0f);
         int randDir = Random.Range(0, 2);
 
         animator.SetInteger("shakeDir", randDir);
