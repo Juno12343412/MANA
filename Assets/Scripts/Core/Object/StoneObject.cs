@@ -60,7 +60,6 @@ public class StoneObject : MonoBehaviour
         distance = Vector3.Normalize(distance);
         distance.y = distance.y < 0 ? 0.3f : distance.y;
 
-
         stoneRig.AddForce(distance * forcePower, ForceMode2D.Impulse);
         animator.SetBool("isStart", true);
         for (int i = 0; i < startLights.Length; i++)
@@ -126,7 +125,7 @@ public class StoneObject : MonoBehaviour
 
     void WaitStart()
     {
-        StartCoroutine(CR_StoneErase(2));
+        StartCoroutine(CR_StoneErase(1));
 
         _ui.Find("BaseUI").GetComponent<Animator>().SetBool("isTalk", false);
         GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().StartEvent();

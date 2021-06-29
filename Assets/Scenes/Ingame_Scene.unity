@@ -2271,7 +2271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -7226,7 +7226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -8168,6 +8168,11 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9198499916214816204, guid: 5e936e63ed59fb6478669a99c0034ec7,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: cf49d9947d37d644dbbc23f4501ac63f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e936e63ed59fb6478669a99c0034ec7, type: 3}
 --- !u!4 &513217242 stripped
@@ -9434,7 +9439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -11496,7 +11501,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 42.6
   m_LightVolumeOpacity: 0
-  m_ApplyToSortingLayers: b1c2cb78738808533105133f00000000f3048d1d61004572
+  m_ApplyToSortingLayers: b1c2cb78
   m_LightCookieSprite: {fileID: 21300000, guid: 4c84d6cdc2379434a8296e960956fab9,
     type: 3}
   m_UseNormalMap: 0
@@ -15479,7 +15484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -15649,7 +15654,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -16303,6 +16308,11 @@ PrefabInstance:
       propertyPath: m_Color.a
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9198499916214816204, guid: 5e936e63ed59fb6478669a99c0034ec7,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: cf49d9947d37d644dbbc23f4501ac63f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e936e63ed59fb6478669a99c0034ec7, type: 3}
 --- !u!4 &917569614 stripped
@@ -16455,7 +16465,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -21946,7 +21956,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1157726438}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.027766556, y: -0.41667235, z: -10}
+  m_LocalPosition: {x: 0.027776271, y: -0.41667235, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 338946799}
@@ -22550,7 +22560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -24934,7 +24944,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -25674,7 +25684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -25893,7 +25903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -26503,7 +26513,7 @@ Transform:
   m_GameObject: {fileID: 1555922199}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1125, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 882995033}
   m_RootOrder: 0
@@ -26604,48 +26614,48 @@ CompositeCollider2D:
   m_ColliderPaths:
   - m_Collider: {fileID: 1555922202}
     m_ColliderPaths:
-    - - X: 165399691
+    - - X: 184007179
         Y: -75027632
-      - X: 165399691
+      - X: 184007179
         Y: -53267056
-      - X: -165399984
+      - X: -184007472
         Y: -53267349
-      - X: -165399691
+      - X: -184007179
         Y: -75027632
   - m_Collider: {fileID: 1555922207}
     m_ColliderPaths:
-    - - X: 184499707
+    - - X: 205255963
         Y: -75000000
-      - X: 184499707
+      - X: 205255963
         Y: 75000000
-      - X: 163921168
+      - X: 182362288
         Y: 74999707
-      - X: 163921461
+      - X: 182362581
         Y: -75000000
   - m_Collider: {fileID: 1555922205}
     m_ColliderPaths:
-    - - X: 184360523
+    - - X: 205101099
         Y: 70876264
-      - X: 184360523
+      - X: 205101099
         Y: 96829688
-      - X: -184360816
+      - X: -205101392
         Y: 96829395
-      - X: -184360523
+      - X: -205101099
         Y: 70876264
   m_CompositePaths:
     m_Paths:
-    - - {x: 16.53994, y: -7.5027633}
-      - {x: 16.539999, y: -7.5}
-      - {x: 18.449972, y: -7.4999704}
-      - {x: 18.449942, y: 7.5}
-      - {x: 18.436052, y: 7.500029}
-      - {x: 18.436022, y: 9.682969}
-      - {x: -18.43608, y: 9.682911}
-      - {x: -18.436022, y: 7.0876265}
-      - {x: 16.392118, y: 7.087597}
-      - {x: 16.392113, y: -5.3267055}
-      - {x: -16.539999, y: -5.326764}
-      - {x: -16.53994, y: -7.5027633}
+    - - {x: 18.400688, y: -7.5027633}
+      - {x: 18.400747, y: -7.5}
+      - {x: 20.525597, y: -7.4999704}
+      - {x: 20.525566, y: 7.5}
+      - {x: 20.51011, y: 7.500029}
+      - {x: 20.51008, y: 9.682969}
+      - {x: -20.51014, y: 9.682911}
+      - {x: -20.51008, y: 7.0876265}
+      - {x: 18.23623, y: 7.087597}
+      - {x: 18.236225, y: -5.3267055}
+      - {x: -18.400747, y: -5.326764}
+      - {x: -18.400688, y: -7.5027633}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
 --- !u!50 &1555922204
@@ -27548,8 +27558,8 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 125.2
   m_LightVolumeOpacity: 0
-  m_ApplyToSortingLayers: b1c2cb78738808533105133f00000000f3048d1d61004572
-  m_LightCookieSprite: {fileID: 21300000, guid: bd15c9d3bd306e54b9645976decd0523,
+  m_ApplyToSortingLayers: b1c2cb78
+  m_LightCookieSprite: {fileID: 21300000, guid: 10f1cf877db199a4f934118d72e6a4da,
     type: 3}
   m_UseNormalMap: 0
   m_LightOrder: 0
@@ -27910,7 +27920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -29360,6 +29370,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dummy1
       objectReference: {fileID: 0}
+    - target: {fileID: 7599472296655777611, guid: 58934c72fe2eb0440b9e2fb9a1eaf1aa,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 58934c72fe2eb0440b9e2fb9a1eaf1aa, type: 3}
 --- !u!1 &1746270415
@@ -30073,7 +30088,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -31690,7 +31705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -36007,7 +36022,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a147e23a6b2747856c831f8baf7f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forcePower: 10
+  forcePower: 15
   playerPos: {fileID: 1133374048}
   startLights:
   - {fileID: 1763490847}
@@ -37335,5 +37350,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+    - target: {fileID: 9198499916214816204, guid: 5e936e63ed59fb6478669a99c0034ec7,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 6200000, guid: cf49d9947d37d644dbbc23f4501ac63f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e936e63ed59fb6478669a99c0034ec7, type: 3}
