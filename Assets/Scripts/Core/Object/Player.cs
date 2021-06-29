@@ -5,12 +5,15 @@ using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using Cinemachine;
 using MANA.Enums;
+using Pooling;
 
 public class Player : PlayerMachine
 {
     ULogger _log;
 
     public Vector2 _attackDir = Vector2.zero;
+
+    [SerializeField] private bool _isStart = false;
 
     [SerializeField] private float _comboGauge = 0;
 
@@ -19,13 +22,15 @@ public class Player : PlayerMachine
     [SerializeField] private Sprite _startImg;
     [SerializeField] private Sprite _upImg;
 
+    [SerializeField] private GameObject _moveEffect = null;
+    ObjectPool<Particle> _particlePool = new ObjectPool<Particle>();
+
     private SpriteRenderer _renderer;
     private Animator _animtor;
     private Rigidbody2D _rigid2D;
 
     bool isStart = false;
     bool isDash = false;
-    float _clickTime = 0f;
 
     protected sealed override void PlayerSetting(ILog log)
     {
@@ -46,6 +51,14 @@ public class Player : PlayerMachine
         _animtor.enabled = false;
 
         _renderer.sprite = _startImg;
+
+        if (_isStart)
+        {
+            isStart = true;
+            _animtor.enabled = true;
+        }
+
+        _particlePool.Init(_moveEffect, 10, transform.position, transform.rotation);
     }
 
     protected sealed override void IdleEvent()
@@ -68,11 +81,16 @@ public class Player : PlayerMachine
             base.WalkEvent();
 
             // 움직이는 로직
-            float x = Input.GetAxisRaw("Horizontal");
+            float x = Input.GetAxisRaw("Horizontal");       
+
             _attackColiders[0].offset = new Vector2(x, 0);
             if (x != 0)
             {
-                _animtor.SetBool("isWalk", true);
+                if (!_animtor.GetBool("isWalk"))
+                {
+                    _animtor.SetBool("isWalk", true);
+                    StartCoroutine("WalkEffector");
+                }
 
                 _renderer.flipX = x == 1 ? false : true;
 
@@ -87,7 +105,7 @@ public class Player : PlayerMachine
                 else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
 
-                if (Input.GetKeyDown(KeyCode.DownArrow)) {
+                if (Input.GetKeyDown(KeyCode.DownArrow) && !_player._stats.IsJump) {
                     Dash(new Vector2(x, 0));
                 }
             }
@@ -142,7 +160,10 @@ public class Player : PlayerMachine
 
         _player._stats.IsAttack = true;
 
+        _attackDir.y = Input.GetAxisRaw("Vertical");
+        
         _animtor.SetBool("isAttack", true);
+        _animtor.SetFloat("AttackY", _attackDir.y);
     }
 
     protected sealed override void SpecialAttackEvent()
@@ -167,6 +188,15 @@ public class Player : PlayerMachine
             return;
     }
 
+    IEnumerable WalkEffector()
+    {
+        while (_player._stats.State == PlayerState.Walk)
+        {
+            _particlePool.Spawn(transform.position);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
     IEnumerator Combo(float time = 0f)
     {
         bool attack = false;
@@ -178,12 +208,8 @@ public class Player : PlayerMachine
             // 방향 공격
             if (_player._stats.State == PlayerState.Attack)
             {
-                // ...
-                _attackDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
                 if ((Input.GetKeyDown(KeyCode.Z) || Input.GetKey(KeyCode.Z)) && _player._stats.IsAttack)
                 {
-                    _animtor.SetFloat("AttackY", _attackDir.y);
                     attack = true;
                     break;
                 }
@@ -203,7 +229,7 @@ public class Player : PlayerMachine
 
     public void AnimComboEvent()
     {
-        StartCoroutine(Combo(0.5f));
+        StartCoroutine(Combo(1f));
     }
 
     protected override void AnimFrameStart()
@@ -219,8 +245,6 @@ public class Player : PlayerMachine
     protected override void AnimFrameEnd()
     {
         if (_animtor.GetBool("isStart")) {
-
-            isStart = true;
             _animtor.SetBool("isStart", false);
         }
         else
@@ -248,7 +272,6 @@ public class Player : PlayerMachine
         {
             if (Input.GetKey(KeyCode.C) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Space))
             {
-                //_rigid2D.velocity += Vector2.up * _player._stats.JumpPower * Time.deltaTime;
                 _rigid2D.AddForce(Vector2.up * _player._stats.JumpPower * Time.deltaTime, ForceMode2D.Impulse);
                 //_renderer.sprite = _upImg;
 
@@ -266,19 +289,24 @@ public class Player : PlayerMachine
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (!isStart && _rigid2D.velocity.y != 0)
+        if (!isStart)
             return;
 
-        _animtor.SetInteger("Jump", 0);
-        _player._stats.IsJump = false;
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            _animtor.SetInteger("Jump", 0);
+            _player._stats.IsJump = false;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("EnemyAttack") && !_animtor.GetBool("isHurt"))
         {
+            other.gameObject.SetActive(false);
+
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-            _rigid2D.AddForce(new Vector2(-_attackDir.x, 0f) * 10f, ForceMode2D.Impulse);
+            _rigid2D.AddForce(new Vector2(-_attackDir.x, 0f) * 15f, ForceMode2D.Impulse);
 
             _animtor.SetBool("isHurt", true);
         }
@@ -286,6 +314,9 @@ public class Player : PlayerMachine
 
     public void StartEvent()
     {
+        if (_isStart)
+            return;
+
         isStart = true;
 
         _animtor.enabled = true;

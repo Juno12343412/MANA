@@ -9,6 +9,8 @@ public class Particle : PoolingObject
     public override void Init()
     {
         base.Init();
+
+        Invoke("Release", 1f);
     }
 
     public override void Release()

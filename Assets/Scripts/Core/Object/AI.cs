@@ -137,6 +137,21 @@ public class AI : AIMachine
             }
             else
             {
+                Vector3 moveVec = Vector3.zero;
+
+                if (targetObj.transform.position.x < transform.position.x)
+                {
+                    moveVec = Vector3.left;
+                    _renderer.flipX = false;
+
+                }
+                else if (targetObj.transform.position.x > transform.position.x)
+                {
+                    moveVec = Vector3.right;
+                    _renderer.flipX = true;
+                }
+                _hurtDir = moveVec;
+
                 MyStats.IsAttack = true;
                 StartCoroutine("AttackLogic");
             }
@@ -165,7 +180,8 @@ public class AI : AIMachine
 
     protected override void AnimFrameStart()
     {
-        _particle.SetActive(true);
+        if (!_particle.activeSelf)
+            _particle?.SetActive(true);
     }
 
     protected override void AnimFrameUpdate()
@@ -179,7 +195,7 @@ public class AI : AIMachine
         if (_animtor.GetBool("isAttack"))
             _animtor.SetBool("isAttack", false);
 
-        _particle.SetActive(false);
+        _particle?.SetActive(false);
     }
 
     IEnumerator PatrolLogic()
@@ -220,7 +236,7 @@ public class AI : AIMachine
             _attackCollider.SetActive(true);
             yield return new WaitForSeconds(0.05f);
             _attackCollider.SetActive(false);
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(1.5f);
             MyStats.IsAttack = false;
         }
     }
@@ -264,14 +280,13 @@ public class AI : AIMachine
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Attack"))
+        if (other.gameObject.CompareTag("Attack") && !_animtor.GetBool("isHurt"))
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
 
-            Debug.Log(_moveDir);
-
             _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * 10f, ForceMode2D.Impulse);
             _animtor.SetBool("isHurt", true);
+            other.gameObject.SetActive(false);
             _attackCollider.SetActive(false);
             MyStats.IsAttack = false;
 

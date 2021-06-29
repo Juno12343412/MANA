@@ -72,7 +72,7 @@ public class StoneObject : MonoBehaviour
         }
         explosionEnd = true;
 
-        Invoke("WaitStart", 3.5f);
+        Invoke("WaitStart", 2f);
     }
 
     public void StartLight(int num)
@@ -127,6 +127,7 @@ public class StoneObject : MonoBehaviour
     {
         StartCoroutine(CR_StoneErase(1));
 
+        stoneRig.velocity = Vector2.zero;
         _ui.Find("BaseUI").GetComponent<Animator>().SetBool("isTalk", false);
         GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().StartEvent();
     }
