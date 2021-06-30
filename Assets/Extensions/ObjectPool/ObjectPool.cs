@@ -68,6 +68,18 @@ namespace Pooling
             return obj;
         }
 
+        public T Find()
+        {
+            var obj = Find(find => find.isActive == false);
+
+            if (obj == null)
+            {
+                // Is Full
+                obj = Create();
+            }
+
+            return obj;
+        }
         // Release 삭제
         public void Destroy(T _obj)
         {

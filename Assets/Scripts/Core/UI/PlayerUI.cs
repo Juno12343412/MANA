@@ -21,11 +21,11 @@ public class PlayerUI : UIElement
     [Inject]
     public PlayerManager _player;
 
-    void Start()
-    {
-        _player._stats.SpecialAttackDuration = 50;
-        _player._stats.CurHP = 100;
-    }
+    //void Start()
+    //{
+    //    _player._stats.SpecialAttackDuration = 50;
+    //    _player._stats.CurHP = 100;
+    //}
 
     void LateUpdate()
     {

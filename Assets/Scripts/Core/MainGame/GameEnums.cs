@@ -63,4 +63,16 @@
         Grass,
         Explosive
     }
+
+    /// <summary>
+    /// 파티클 오브젝트 종류
+    /// </summary>
+    public enum ParticleKind : byte
+    {
+        Move,
+        Hit, Obs, Obs2,
+        Explosion,
+        Dash, Dash2,
+        NONE = 99
+    }
 }

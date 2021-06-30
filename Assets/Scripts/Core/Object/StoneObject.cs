@@ -128,7 +128,7 @@ public class StoneObject : MonoBehaviour
         StartCoroutine(CR_StoneErase(1));
 
         stoneRig.velocity = Vector2.zero;
-        _ui.Find("BaseUI").GetComponent<Animator>().SetBool("isTalk", false);
+        _ui.Find("BaseUI").GetComponent<Animator>().SetInteger("isTalk", 1);
         GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().StartEvent();
     }
 }

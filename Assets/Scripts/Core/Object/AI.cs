@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
+using UDBase.Controllers.ParticleSystem;
 using UDBase.Utils;
 using Cinemachine;
 using MANA.Enums;
+using Zenject;
 
 public class AI : AIMachine
 {
@@ -21,6 +23,9 @@ public class AI : AIMachine
     Vector3 _startPosition = Vector3.zero;
     Vector3 _moveDir = Vector3.zero;
     Vector3 _hurtDir = Vector3.zero;
+
+    [Inject]
+    readonly ParticleManager _particleManager;
 
     protected sealed override void AISetting(ILog log)
     {
@@ -180,8 +185,7 @@ public class AI : AIMachine
 
     protected override void AnimFrameStart()
     {
-        if (!_particle.activeSelf)
-            _particle?.SetActive(true);
+        _particleManager?.ShowParticle(ParticleKind.Hit, transform.position);
     }
 
     protected override void AnimFrameUpdate()
@@ -194,8 +198,6 @@ public class AI : AIMachine
 
         if (_animtor.GetBool("isAttack"))
             _animtor.SetBool("isAttack", false);
-
-        _particle?.SetActive(false);
     }
 
     IEnumerator PatrolLogic()
@@ -284,7 +286,7 @@ public class AI : AIMachine
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
 
-            _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * 10f, ForceMode2D.Impulse);
+            _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * 5f, ForceMode2D.Impulse);
             _animtor.SetBool("isHurt", true);
             other.gameObject.SetActive(false);
             _attackCollider.SetActive(false);

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
+using UDBase.Controllers.ParticleSystem;
 using Cinemachine;
 using MANA.Enums;
-using Pooling;
+using Zenject;
 
 public class Player : PlayerMachine
 {
@@ -22,8 +23,7 @@ public class Player : PlayerMachine
     [SerializeField] private Sprite _startImg;
     [SerializeField] private Sprite _upImg;
 
-    [SerializeField] private GameObject _moveEffect = null;
-    ObjectPool<Particle> _particlePool = new ObjectPool<Particle>();
+    [SerializeField] private GameObject _playerEffect = null;
 
     private SpriteRenderer _renderer;
     private Animator _animtor;
@@ -31,6 +31,9 @@ public class Player : PlayerMachine
 
     bool isStart = false;
     bool isDash = false;
+
+    [Inject]
+    readonly ParticleManager _particleManager;
 
     protected sealed override void PlayerSetting(ILog log)
     {
@@ -57,8 +60,6 @@ public class Player : PlayerMachine
             isStart = true;
             _animtor.enabled = true;
         }
-
-        _particlePool.Init(_moveEffect, 10, transform.position, transform.rotation);
     }
 
     protected sealed override void IdleEvent()
@@ -88,9 +89,12 @@ public class Player : PlayerMachine
             {
                 if (!_animtor.GetBool("isWalk"))
                 {
+
                     _animtor.SetBool("isWalk", true);
-                    StartCoroutine("WalkEffector");
                 }
+                
+                if (!_player._stats.IsJump)
+                    _particleManager.ShowParticle(ParticleKind.Move, transform.position);
 
                 _renderer.flipX = x == 1 ? false : true;
 
@@ -105,7 +109,8 @@ public class Player : PlayerMachine
                 else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
 
-                if (Input.GetKeyDown(KeyCode.DownArrow) && !_player._stats.IsJump) {
+                if (Input.GetKeyDown(KeyCode.DownArrow) && _rigid2D.velocity.y <= 0.1f) {
+                    _particleManager.ShowParticle(ParticleKind.Move, transform.position, null, 20);
                     Dash(new Vector2(x, 0));
                 }
             }
@@ -139,7 +144,7 @@ public class Player : PlayerMachine
             base.JumpEvent();
 
             _player._stats.IsJump = true;
-            StartCoroutine(GetJumpForce(1));
+            StartCoroutine(GetJumpForce(1f));
         }
     }
 
@@ -188,14 +193,18 @@ public class Player : PlayerMachine
             return;
     }
 
-    IEnumerable WalkEffector()
-    {
-        while (_player._stats.State == PlayerState.Walk)
-        {
-            _particlePool.Spawn(transform.position);
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
+    //IEnumerable WalkEffector()
+    //{
+    //    Debug.Log("걷는 중1");
+    //    yield return null;
+
+    //    //while (true)
+    //    //{
+    //    //    Debug.Log("걷는 중2");
+    //    //    _particleManager.ShowParticle(ParticleKind.Move, transform.position);
+    //    //    yield return new WaitForSeconds(0.25f);
+    //    //}
+    //}
 
     IEnumerator Combo(float time = 0f)
     {
@@ -229,7 +238,7 @@ public class Player : PlayerMachine
 
     public void AnimComboEvent()
     {
-        StartCoroutine(Combo(1f));
+        StartCoroutine(Combo(1.2f));
     }
 
     protected override void AnimFrameStart()
@@ -267,6 +276,8 @@ public class Player : PlayerMachine
         _animtor.SetInteger("Jump", 1);
         _renderer.sprite = _upImg;
         _rigid2D.AddForce(Vector3.up * _player._stats.JumpPower, ForceMode2D.Impulse);
+        _particleManager.ShowParticle(ParticleKind.Move, transform.position, null, 20);
+        yield return null;
 
         while (progress <= time)
         {
@@ -325,18 +336,36 @@ public class Player : PlayerMachine
 
     void Dash(Vector2 _dir)
     {
-        Debug.Log("Dash : " + _dir * _player._stats.MoveSpeed * 2f);
+        _particleManager?.ShowParticle(ParticleKind.Dash, transform.position);
+
+        _playerEffect.transform.localEulerAngles = _renderer.flipX == true ? new Vector3(0f, 180f, 0f) : new Vector3(0f, 0f, 0f);
+        _playerEffect.SetActive(true);
 
         isDash = true;
 
         GetComponent<CinemachineImpulseSource>().GenerateImpulse();
         _rigid2D.AddForce(_dir * _player._stats.MoveSpeed * 4f, ForceMode2D.Impulse);
 
+        StartCoroutine(DashParticle(0.5f, 0.01f));
         Invoke("DashEnd", 0.15f);
     }
 
     void DashEnd()
     {
         isDash = false;
+    }
+
+    IEnumerator DashParticle(float _time, float _rate)
+    {
+        float progress = 0f;
+        yield return null;
+
+        while (progress <= _time)
+        {
+            _particleManager.ShowParticle(ParticleKind.Dash2, transform.position, null, 1);
+
+            progress += _rate;
+            yield return new WaitForSeconds(_rate);
+        }
     }
 }
