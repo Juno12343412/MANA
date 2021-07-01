@@ -22,12 +22,12 @@ public class ManaPiece : MonoBehaviour
         string temp = gameObject.name;
         int.TryParse(temp, out _name);
         _name = _name % 2;
-
+        
         if (start != null)
         {
             point[0] = start.transform.position; // P0
-            point[1] = PointSetting(start.transform.position); // P1
-            point[2] = PointSetting(originPos); // P2
+            point[1] = _posA == null ? PointSetting(start.transform.position) : new Vector2(_posA.position.x, _posA.position.y); // P1
+            point[2] = _posA == null ? PointSetting(originPos) : new Vector2(_posA.position.x, _posA.position.y); // P2
             point[3] = originPos; // P3
             transform.position = start.transform.position;
         }
@@ -69,20 +69,12 @@ public class ManaPiece : MonoBehaviour
     Vector2 PointSetting(Vector2 origin)
     {
         float x, y;
-        if (_posA == null)
-        {
-            x = posA * Mathf.Cos(Random.Range(0, 360) * Mathf.Deg2Rad)
-                + origin.x;
-            y = posB * Mathf.Sin(Random.Range(0, 360) * Mathf.Deg2Rad)
-            + origin.y;
-            return new Vector2(x, y);
-        }
-        else
-        {
-            return new Vector2(_posA.position.x, _posA.position.y);
-        }
 
-        
+        x = posA * Mathf.Cos(Random.Range(0, 360) * Mathf.Deg2Rad)
+            + origin.x;
+        y = posB * Mathf.Sin(Random.Range(0, 360) * Mathf.Deg2Rad)
+        + origin.y;
+        return new Vector2(x, y);
     }
 
     void DrawTrajectory()

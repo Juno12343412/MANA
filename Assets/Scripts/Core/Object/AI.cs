@@ -19,6 +19,7 @@ public class AI : AIMachine
 
     [SerializeField] private GameObject _attackCollider;
     [SerializeField] private GameObject _particle;
+    [SerializeField] private float _hp = 5;
 
     Vector3 _startPosition = Vector3.zero;
     Vector3 _moveDir = Vector3.zero;
@@ -40,7 +41,7 @@ public class AI : AIMachine
         base.AISetting(log);
 
         Kind = ObjectKind.Enemy;
-        MyStats.CurHP = MyStats.MaxHP = 100;
+        MyStats.CurHP = MyStats.MaxHP = _hp;
         MyStats.Radius = 5f;
         MyStats.MoveSpeed = 5f;
         MyStats.IsPatrol = false;
@@ -292,7 +293,7 @@ public class AI : AIMachine
             _attackCollider.SetActive(false);
             MyStats.IsAttack = false;
 
-            MyStats.CurHP -= 10;
+            MyStats.CurHP -= 1;
 
             if (!IsDead())
             {

@@ -130,8 +130,9 @@ namespace UDBase.Controllers.ObjectSystem
 
             MyStats.State = AIState.Idle;
             StartCoroutine(MyStats.State.ToString());
+            
         }
-
+        
         void ChanageState()
         {
 
