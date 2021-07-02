@@ -19,7 +19,6 @@ namespace UDBase.Controllers.ObjectSystem
         [Serializable]
         public class Stats
         {
-
             /// <summary>
             /// 현재 체력
             /// </summary>
@@ -89,6 +88,11 @@ namespace UDBase.Controllers.ObjectSystem
             /// 마나를 가지고 있는가 ?
             /// </summary>
             public bool IsMana;
+
+            /// <summary>
+            /// 대쉬를 가지고 있는가 ?
+            /// </summary>
+            public bool IsDash;
 
             public PlayerState State;
         }

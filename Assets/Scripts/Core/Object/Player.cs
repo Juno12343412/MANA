@@ -31,6 +31,7 @@ public class Player : PlayerMachine
 
     bool isStart = false;
     bool isDash = false;
+    bool isGrand = false;
 
     [Inject]
     readonly ParticleManager _particleManager;
@@ -40,10 +41,10 @@ public class Player : PlayerMachine
         _log = log.CreateLogger(this);
         base.PlayerSetting(log);
 
-        _player._stats.CurHP = _player._stats.MaxHP = 100;
+        _player._stats.CurHP = _player._stats.MaxHP = 7;
         _player._stats.Damage = _player._stats.Damage = 10;
         _player._stats.AttackDuration = _player._stats.AttackDuration = 2;
-        _player._stats.SpecialAttackDuration = _player._stats.SpecialAttackDuration = 100;
+        _player._stats.SpecialAttackDuration = _player._stats.SpecialAttackDuration = 1000;
         _player._stats.AttackSpeed = _player._stats.AttackSpeed = 2;
         _player._stats.JumpPower = 12;
         _player._stats.MoveSpeed = 7;
@@ -109,7 +110,7 @@ public class Player : PlayerMachine
                 else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
 
-                if (Input.GetKeyDown(KeyCode.DownArrow) && _rigid2D.velocity.y <= 0.1f) {
+                if (Input.GetKeyDown(KeyCode.DownArrow) && _player._stats.IsDash && _player._stats.SpecialAttackDuration >= 20f) {
                     _particleManager.ShowParticle(ParticleKind.Move, transform.position, null, 20);
                     Dash(new Vector2(x, 0));
                 }
@@ -145,6 +146,7 @@ public class Player : PlayerMachine
 
             _player._stats.IsJump = true;
             StartCoroutine(GetJumpForce(1f));
+            //StartCoroutine(GradientCheck());
         }
     }
 
@@ -193,19 +195,6 @@ public class Player : PlayerMachine
             return;
     }
 
-    //IEnumerable WalkEffector()
-    //{
-    //    Debug.Log("걷는 중1");
-    //    yield return null;
-
-    //    //while (true)
-    //    //{
-    //    //    Debug.Log("걷는 중2");
-    //    //    _particleManager.ShowParticle(ParticleKind.Move, transform.position);
-    //    //    yield return new WaitForSeconds(0.25f);
-    //    //}
-    //}
-
     IEnumerator Combo(float time = 0f)
     {
         bool attack = false;
@@ -253,18 +242,46 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameEnd()
     {
-        if (_animtor.GetBool("isStart")) {
+        if (_animtor.GetBool("isStart") && isGrand) {
             _animtor.SetBool("isStart", false);
+            isGrand = false;
+            isStart = true;
         }
         else
         {
             _player._stats.IsAttack = false;
             _attackColiders[0].gameObject.SetActive(false);
 
+            if (_animtor.GetInteger("Jump") == 2)
+            {
+                _animtor.SetInteger("Jump", 0);
+                _player._stats.IsJump = false;
+            }
+
             _animtor.SetBool("isAttack", false);
             _animtor.SetFloat("Attack", 0);
             _animtor.SetInteger("AttackY", 0);
             _animtor.SetBool("isHurt", false);
+        }
+    }
+
+    IEnumerator GradientCheck()
+    {
+        Debug.Log("그라디언트 체크");
+
+        float progress = 0f;
+        yield return null;
+    
+        while (progress <= 4.5f && _player._stats.IsJump)
+        {
+            progress += Time.deltaTime;
+            yield return null;
+        }
+        
+        if (_player._stats.IsJump && !isGrand)
+        {
+            Debug.Log("그라디언트 체크 끝");
+            isGrand = true;
         }
     }
 
@@ -295,7 +312,8 @@ public class Player : PlayerMachine
                 break;
             }
         }
-        _animtor.SetInteger("Jump", 2);
+        if (!isGrand)
+            _animtor.SetInteger("Jump", 2);
     }
 
     void OnCollisionEnter2D(Collision2D other)
@@ -305,8 +323,35 @@ public class Player : PlayerMachine
 
         if (other.gameObject.CompareTag("Ground"))
         {
-            _animtor.SetInteger("Jump", 0);
-            _player._stats.IsJump = false;
+            if (!isGrand)
+            {
+                _animtor.SetInteger("Jump", 0);
+                _player._stats.IsJump = false;
+            }
+            else
+            {
+                _animtor.SetInteger("Jump", 0);
+                _player._stats.IsJump = false;
+                _animtor.SetBool("isWalk", false);
+                _animtor.SetBool("isStart", true);
+                isStart = false;
+
+                _particleManager?.ShowParticle(ParticleKind.Move, transform.position, null, 25);
+            }
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D other)
+    {
+        if (!isStart)
+            return;
+
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            if (!isGrand)
+            {
+                StartCoroutine(GradientCheck());
+            }
         }
     }
 
@@ -336,36 +381,38 @@ public class Player : PlayerMachine
 
     void Dash(Vector2 _dir)
     {
-        _particleManager?.ShowParticle(ParticleKind.Dash, transform.position);
+        CancelInvoke();
 
-        _playerEffect.transform.localEulerAngles = _renderer.flipX == true ? new Vector3(0f, 180f, 0f) : new Vector3(0f, 0f, 0f);
+        _particleManager?.ShowParticle(ParticleKind.Dash, transform.position, null, 5);
+
+        ParticleSystem.MainModule r = _playerEffect.GetComponentInChildren<ParticleSystem>().main;
+        r.startRotationY = _renderer.flipX == true ? 180f * Mathf.Deg2Rad : 0f;
+
+        _playerEffect.SetActive(false);
         _playerEffect.SetActive(true);
 
         isDash = true;
 
+        _player._stats.SpecialAttackDuration -= 20f;
+
+        if (_player._stats.SpecialAttackDuration <= 0f)
+            _player._stats.SpecialAttackDuration = 0f;
+
         GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+        _rigid2D.velocity = new Vector2(0f, _rigid2D.velocity.y);
         _rigid2D.AddForce(_dir * _player._stats.MoveSpeed * 4f, ForceMode2D.Impulse);
 
-        StartCoroutine(DashParticle(0.5f, 0.01f));
         Invoke("DashEnd", 0.15f);
+        Invoke("DashEffectEnd", 1f);
+    }
+
+    void DashEffectEnd()
+    {
+        _playerEffect.SetActive(false);
     }
 
     void DashEnd()
     {
         isDash = false;
-    }
-
-    IEnumerator DashParticle(float _time, float _rate)
-    {
-        float progress = 0f;
-        yield return null;
-
-        while (progress <= _time)
-        {
-            _particleManager.ShowParticle(ParticleKind.Dash2, transform.position, null, 1);
-
-            progress += _rate;
-            yield return new WaitForSeconds(_rate);
-        }
     }
 }

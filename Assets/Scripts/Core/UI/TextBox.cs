@@ -22,8 +22,12 @@ public class TextBox : MonoBehaviour, ILogContext
 
     protected Dictionary<string, KeySetting> _talkKeys;
 
+    [SerializeField] private GameObject _markObj = null;
+
     public List<string> _talkList = new List<string>();
     public static TextBox instance = new TextBox();
+
+    public bool isTalkEnd = false;
 
     int _curText = -1;
     bool _isInteraction = false;
@@ -52,6 +56,10 @@ public class TextBox : MonoBehaviour, ILogContext
         if (_player._stats.IsTalk)
             return;
 
+        isTalkEnd = false;
+
+        _markObj.SetActive(false);
+
         _ui.Find("BaseUI").GetComponent<Animator>().SetInteger("isTalk", 0);
 
         _talkList = _list;
@@ -74,14 +82,12 @@ public class TextBox : MonoBehaviour, ILogContext
 
     void Next()
     {
-        Debug.Log("In");
-
         if (!_player._stats.IsTalk)
             return;
 
         if (_talkList.Count > _curText && !_talkList[_curText].Contains("[Interaction]") && !_talkList[_curText].Contains("[Small]"))
         {
-            Debug.Log("1");
+            Invoke("ShowMark", 0.2f * _talkList[_curText].Length);
 
             _isInteraction = false;
 
@@ -98,8 +104,6 @@ public class TextBox : MonoBehaviour, ILogContext
         }
         else if (_talkList.Count > _curText && _talkList[_curText].Contains("[Interaction]"))
         {
-            Debug.Log("2");
-
             _isInteraction = true;
 
             _ui.Hide("TextUI_SmallBox");
@@ -162,10 +166,14 @@ public class TextBox : MonoBehaviour, ILogContext
         _ui.Find("TextUI_NO_Base").SetActive(true);
     }
 
+    void ShowMark()
+    {
+        if (!_markObj.activeSelf)
+            _markObj.SetActive(true);        
+    }
+
     public void TalkEnd()
     {
-        Debug.Log(_ui.Find("BaseUI"));
-
         _ui.Find("BaseUI").GetComponent<Animator>().SetInteger("isTalk", 1);
 
         _ui.Hide("TalkUI");
@@ -173,5 +181,6 @@ public class TextBox : MonoBehaviour, ILogContext
         _ui.Hide("TextUI_InteractionBox");
 
         _player._stats.IsTalk = false;
+        isTalkEnd = true;
     }
 }

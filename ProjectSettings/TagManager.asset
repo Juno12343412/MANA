@@ -12,6 +12,8 @@ TagManager:
   - Enemy
   - Wreck
   - Wall
+  - Item
+  - Action
   layers:
   - Default
   - TransparentFX
