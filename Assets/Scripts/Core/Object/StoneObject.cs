@@ -84,9 +84,9 @@ public class StoneObject : MonoBehaviour
 
     IEnumerator CR_IntensityUp(Light2D light)
     {
-        while (light.intensity <= 14)
+        while (light.intensity <= 49)
         {
-            light.intensity = Mathf.Lerp(light.intensity, 15, 0.4f * Time.deltaTime);
+            light.intensity = Mathf.Lerp(light.intensity, 50, 0.6f * Time.deltaTime);
             yield return null;
         }
     }

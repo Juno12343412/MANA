@@ -79,7 +79,10 @@ public class Destructible : AIMachine
             //        wallPieceDir = new Vector2(0, -1);
             //        break;
             //}
-            wallPieceDir = new Vector3(obj.transform.position.x, transform.position.y,0) - wallPiece[i].transform.position;
+            if(kind == DestructKind.DestructibleX)
+                wallPieceDir = new Vector3(obj.transform.position.x, transform.position.y,0) - wallPiece[i].transform.position;
+            else if(kind == DestructKind.DestructibleY)
+                wallPieceDir = new Vector3(transform.position.x, obj.transform.position.y, 0) - wallPiece[i].transform.position;
             Vector3.Normalize(wallPieceDir);
             wallPieceDir = new Vector2(wallPieceDir.x * 2, wallPieceDir.y);
             //float length = Vector3.Distance(transform.position, wallPiece[i].transform.position);

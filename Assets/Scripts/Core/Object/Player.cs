@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.ParticleSystem;
@@ -24,6 +25,7 @@ public class Player : PlayerMachine
     [SerializeField] private Sprite _upImg;
 
     [SerializeField] private GameObject _playerEffect = null;
+    [SerializeField] private Image _playerHitFX = null;
 
     private SpriteRenderer _renderer;
     private Animator _animtor;
@@ -32,6 +34,7 @@ public class Player : PlayerMachine
     bool isStart = false;
     bool isDash = false;
     bool isGrand = false;
+    public bool isTest = false;
 
     [Inject]
     readonly ParticleManager _particleManager;
@@ -61,6 +64,8 @@ public class Player : PlayerMachine
             isStart = true;
             _animtor.enabled = true;
         }
+        if (isTest) _player._stats.IsDash = true;
+        StartCoroutine(CR_ScreenHitFX());
     }
 
     protected sealed override void IdleEvent()
@@ -357,14 +362,36 @@ public class Player : PlayerMachine
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Vector3 temp = other.transform.position - transform.position;
+        temp = temp.normalized;
         if (other.gameObject.CompareTag("EnemyAttack") && !_animtor.GetBool("isHurt"))
         {
             other.gameObject.SetActive(false);
 
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-            _rigid2D.AddForce(new Vector2(-_attackDir.x, 0f) * 15f, ForceMode2D.Impulse);
+
+            _rigid2D.AddForce(new Vector2(-temp.x, 0f) * 5f, ForceMode2D.Impulse);
 
             _animtor.SetBool("isHurt", true);
+            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
+        }
+        if (other.gameObject.CompareTag("Pattern1"))
+        {
+            other.gameObject.SetActive(false);
+
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+
+            _animtor.SetBool("isHurt", true);
+            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
+        }
+        if (other.gameObject.CompareTag("Pattern2"))
+        {
+            other.gameObject.SetActive(false);
+
+            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+            _rigid2D.AddForce(new Vector2(-temp.x, 0f) * 10f, ForceMode2D.Impulse);
+            _animtor.SetBool("isHurt", true);
+            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
         }
     }
 
@@ -414,5 +441,17 @@ public class Player : PlayerMachine
     void DashEnd()
     {
         isDash = false;
+    }
+
+    IEnumerator CR_ScreenHitFX()
+    {
+        while (true)
+        {
+            if (_playerHitFX.color.a > 0.0f)
+            {
+                _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, _playerHitFX.color.a - 2.0f / 255.0f);
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

@@ -5,6 +5,8 @@ using UnityEngine;
 public class WallPiece : MonoBehaviour
 {
     SpriteRenderer sprite;
+    public float power = 20.0f;
+    public float time = 1.5f;
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
@@ -15,7 +17,7 @@ public class WallPiece : MonoBehaviour
         gameObject.SetActive(true);
 
         GetComponent<Rigidbody2D>().AddForce(-dir * 20.0f, ForceMode2D.Impulse);
-        StartCoroutine(CR_Erase(1.5f));
+        StartCoroutine(CR_Erase(time));
     }
 
     IEnumerator CR_Erase(float _time)

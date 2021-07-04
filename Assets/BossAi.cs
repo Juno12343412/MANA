@@ -31,15 +31,16 @@ public class BossAi : MonoBehaviour
     [SerializeField] private BoxCollider2D _PatternCollider3;
     [SerializeField] private Material _HitMaterial;
     [Header("Boss Stats")]
-    [SerializeField] private float _hp = 50.0f;
+    [SerializeField] private float hp = 5.0f;
     [SerializeField] private float _Speed = 5.0f;
-    [SerializeField] private float _delay = 0.0f;
+    [SerializeField] private float _delay = 1.0f;
+    [SerializeField] private float _groggyDelay = 2.0f;
+    [Header("Boss Signal")]
+    [SerializeField] private GameObject wallHitSignal;
 
     Animator _animtor;
     SpriteRenderer _renderer;
     Rigidbody2D _rigid;
-    private float maxHp;
-    private float hp;
     private float speed;
     private Material _OriginMaterail;
     Vector3 _hurtDir = Vector3.zero;
@@ -48,6 +49,14 @@ public class BossAi : MonoBehaviour
     BossState prevState = BossState.Idle;
     bool pattern1Dis = false;
     int groggyCount = 0;
+    bool pattern3End = false;
+    
+
+    Vector3 start;
+    Vector3 target;
+    float heightArc;
+    float bestY = -10;
+    bool search = false;
 
     void Start()
     {
@@ -58,7 +67,6 @@ public class BossAi : MonoBehaviour
         _renderer = GetComponent<SpriteRenderer>();
         _rigid = GetComponent<Rigidbody2D>();
 
-        hp = maxHp = _hp;
         speed = _Speed;
         state = BossState.Idle;
         Idle();
@@ -78,55 +86,62 @@ public class BossAi : MonoBehaviour
 
     void Idle()
     {
+        state = BossState.Idle;
+        TurnBody();
         _animtor.SetBool("isIdle", true);
-        _animtor.SetInteger("Pattern", 0);
-        _animtor.SetBool("isGroggy", false);
         StartCoroutine(CR_ChangePattern(_delay));
-        Debug.Log("기본자세");
     }
     void Groggy()
     {
+        state = BossState.Groggy;
+        groggyCount = 0;
+
         _animtor.SetBool("isIdle", false);
-        _animtor.SetInteger("Pattern", 0);
         _animtor.SetBool("isGroggy", true);
-        Debug.Log("그로기");
-        StartCoroutine(CR_Test());
+        StartCoroutine(CR_Groggy());
     }
 
     void Pattern1()
     {
+        state = BossState.Pattern1;
+
+        TurnBody();
         _animtor.SetBool("isIdle", false);
         _animtor.SetInteger("Pattern", 1);
-        _animtor.SetBool("isGroggy", false);
 
         prevState = BossState.Pattern1;
         groggyCount++;
-        Debug.Log("패턴1");
-        StartCoroutine(CR_Test());
     }
 
     void Pattern2()
     {
+        state = BossState.Pattern2;
+
+        TurnBody();
         _animtor.SetBool("isIdle", false);
         _animtor.SetInteger("Pattern", 2);
-        _animtor.SetBool("isGroggy", false);
 
         prevState = BossState.Pattern2;
         groggyCount++;
-        Debug.Log("패턴2");
-        StartCoroutine(CR_Test());
     }
 
     void Pattern3()
     {
+        state = BossState.Pattern3;
+
+        TurnBody();
         _animtor.SetBool("isIdle", false);
         _animtor.SetInteger("Pattern", 3);
-        _animtor.SetBool("isGroggy", false);
+
+        pattern3End = true;
+        start = new Vector3(transform.position.x , -6.35658f, 1);
+        target = new Vector3(targetObj.transform.position.x, start.y, 1);
+        heightArc = Vector3.Distance(start, target) * 0.65f;
+        bestY = -10.0f;
+        search = false;
 
         prevState = BossState.Pattern3;
         groggyCount++;
-        Debug.Log("패턴3");
-        StartCoroutine(CR_Test());
     }
     IEnumerator EnemyErase(float _time)
     {
@@ -150,12 +165,21 @@ public class BossAi : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            pattern1Dis = true;
+        }
+    }
+
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Player"))
         {
             pattern1Dis = false;
         }
+
     }
 
     void Hurt(GameObject obj)
@@ -188,8 +212,12 @@ public class BossAi : MonoBehaviour
 
     void HitWall()
     {
+        wallHitSignal.GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+        _animtor.SetBool("isIdle", false);
+        _animtor.SetInteger("Pattern", 0);
+        _animtor.SetBool("isGroggy", false);
         state = BossState.HitWall;
-        StartCoroutine(CR_ChangePattern(0.3f));
+        _animtor.SetBool("isWallHit", true);
     }
 
 
@@ -210,45 +238,31 @@ public class BossAi : MonoBehaviour
 
     void DeadEvent()
     {
-        Vector2 _dir = new Vector2(-_hurtDir.x, 5f);
-
-        _rigid.velocity = Vector2.zero;
-        _rigid.AddForce(_dir * speed / 2f, ForceMode2D.Impulse);
-        GetComponent<BoxCollider2D>().enabled = false;
-
-        StartCoroutine(EnemyErase(3f));
+        state = BossState.Dead;
+        _animtor.SetBool("isDead", true);
     }
 
     IEnumerator CR_ChangePattern(float _time)
     {
-        if (hp <= 0)
-        {
-            hp = 0;
-            state = BossState.Dead;
-            yield return null;
-        }
         yield return new WaitForSeconds(_time);
+        if (state == BossState.Dead)
+            yield return null;
         if (state == BossState.HitWall)
         {
-            state = BossState.Idle;
             Idle();
         }
         else if (groggyCount == 6)
         {
-            groggyCount = 0;
-            state = BossState.Groggy;
             Groggy();
         }
         else if (pattern1Dis)
         {
             if (prevState != BossState.Pattern1)
             {
-                state = BossState.Pattern1;
                 Pattern1();
             }
             else
             {
-                state = BossState.Pattern2;
                 Pattern2();
             }
         }
@@ -256,29 +270,78 @@ public class BossAi : MonoBehaviour
         {
             if (prevState != BossState.Pattern2)
             {
-                state = BossState.Pattern2;
                 Pattern2();
             }
             else
             {
-                state = BossState.Pattern3;
                 Pattern3();
             }
         }
     }
 
-    IEnumerator CR_Test()
+    IEnumerator CR_Groggy()
     {
-        yield return new WaitForSeconds(_delay);
+        yield return new WaitForSeconds(_groggyDelay);
         FrameEnd();
     }
     public void FrameEnd()
     {
-        //_PatternCollider1.enabled = false;
-        //_PatternCollider2.enabled = false;
-        //_PatternCollider3.enabled = false;
+        _animtor.SetBool("isIdle", false);
+        _animtor.SetInteger("Pattern", 0);
+        _animtor.SetBool("isGroggy", false);
+        _animtor.SetBool("isWallHit", false);
+        _animtor.SetBool("isFall", false);
+        _animtor.SetBool("Landing", false);
         state = BossState.Idle;
         Idle();
-        //애니메이터 변수 초기화;
+    }
+
+    public void Pattern2Move()
+    {
+        StartCoroutine(CR_Pattern2Move());
+    }
+
+    IEnumerator CR_Pattern2Move()
+    {
+        float acc = 1.01f;
+        while (state == BossState.Pattern2)
+        {
+            transform.position += new Vector3(-_hurtDir.x, 0, 0) * speed * acc * Time.deltaTime;
+            acc += 0.03f;
+            yield return null;
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (pattern3End)
+        {
+            float x0 = start.x;
+            float x1 = target.x;
+            float distance = x1 - x0;
+            float nextX = Mathf.MoveTowards(transform.position.x, x1, 15 * Time.deltaTime);
+            float baseY = Mathf.Lerp(start.y, target.y, (nextX - x0) / distance);
+            float arc = heightArc * (nextX - x0) * (nextX - x1) / (-0.25f * distance * distance);
+            Vector3 nextPosition = new Vector3(nextX, baseY + arc, 1);
+            transform.position = nextPosition;
+
+            if (transform.position.y > bestY)
+            {
+                bestY = transform.position.y;
+            }
+            else if (search == false)
+            {
+                _animtor.SetInteger("Pattern", 0);
+                _animtor.SetBool("isFall", true);
+                search = true;
+            }
+            if(transform.position.y == start.y  && search == true)
+            {
+                _animtor.SetBool("Landing", true);
+                transform.position = new Vector3(target.x, start.y, 1);
+                wallHitSignal.GetComponent<CinemachineImpulseSource>().GenerateImpulse();
+                pattern3End = false;
+            }
+        }
     }
 }

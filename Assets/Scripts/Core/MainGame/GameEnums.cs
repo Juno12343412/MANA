@@ -59,7 +59,8 @@
     /// </summary>
     enum DestructKind : byte
     {
-        Destructible,
+        DestructibleX,
+        DestructibleY,
         Grass,
         Explosive
     }
