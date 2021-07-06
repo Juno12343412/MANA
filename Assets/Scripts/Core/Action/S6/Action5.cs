@@ -10,6 +10,7 @@ public class Action5 : ActionEvent
     [SerializeField] private List<string> _textList2;
 
     [SerializeField] private GameObject _camera = null;
+    [SerializeField] private GameObject _boss = null;
 
     void Start()
     {
@@ -65,6 +66,8 @@ public class Action5 : ActionEvent
             _playerManager._stats.IsEvent = false;
 
             // 여기에 보스 시작 넣으삼
+            _boss.SetActive(true);
+            //gameObject.SetActive(false);
 
             EndAction();
             return false;
