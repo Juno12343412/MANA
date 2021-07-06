@@ -11,6 +11,13 @@
         NONE = 99
     }
 
+    public enum NPCKind : byte {
+        
+        Radia,
+        Guard, Elder, Baby,
+        NONE = 99
+    }
+
     /// <summary>
     /// 플레이어의 상태 종류
     /// </summary>
@@ -71,9 +78,10 @@
     public enum ParticleKind : byte
     {
         Move,
-        Hit, Obs, Obs2,
-        Explosion,
-        Dash, Dash2,
+        Hit, Hit2,
+        Obs, Obs2,
+        Explosion, Explosion2,
+        Dash, Dash2, Dash3,
         NONE = 99
     }
 }

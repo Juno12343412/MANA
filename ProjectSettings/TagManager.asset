@@ -17,6 +17,7 @@ TagManager:
   - BossRange
   - Pattern1
   - Pattern2
+  - Grass
   layers:
   - Default
   - TransparentFX

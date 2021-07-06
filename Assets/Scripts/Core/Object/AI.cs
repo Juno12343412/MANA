@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
@@ -8,6 +6,7 @@ using UDBase.Controllers.ParticleSystem;
 using UDBase.Utils;
 using Cinemachine;
 using MANA.Enums;
+using Manager.Sound;
 using Zenject;
 
 public class AI : AIMachine
@@ -49,7 +48,6 @@ public class AI : AIMachine
 
     protected sealed override void IdleEvent()
     {
-
         base.IdleEvent();
 
         MyStats.State = AIState.Patrol;
@@ -57,7 +55,6 @@ public class AI : AIMachine
 
     protected sealed override void PatrolEvent()
     {
-
         base.PatrolEvent();
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius)
@@ -75,7 +72,6 @@ public class AI : AIMachine
 
     protected sealed override void TrackEvent()
     {
-
         base.TrackEvent();
 
         if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) <= MyStats.Radius / 2)
@@ -138,7 +134,7 @@ public class AI : AIMachine
         {
             if (Vector2.Distance(gameObject.transform.position, targetObj.transform.position) > MyStats.Radius / 2)
             {
-                _rigid.velocity = Vector2.zero;
+                //_rigid.velocity = Vector2.zero;
                 MyStats.State = AIState.Patrol;
             }
             else
@@ -166,8 +162,9 @@ public class AI : AIMachine
 
     protected sealed override void DeadEvent()
     {
-
         base.DeadEvent();
+
+        StopCoroutine("AttackLogic");
 
         Vector2 _dir = new Vector2(-_hurtDir.x, 5f);
 
@@ -175,18 +172,22 @@ public class AI : AIMachine
         _rigid.AddForce(_dir * MyStats.MoveSpeed / 2f, ForceMode2D.Impulse);
         GetComponent<BoxCollider2D>().enabled = false;
 
-        StartCoroutine(EnemyErase(3f));
+        _particleManager?.ShowParticle(ParticleKind.Explosion2, transform.position);
+
+        SoundPlayer.instance.PlaySound("Obj_Dmg_on_2");
+        SoundPlayer.instance.PlaySound("E1_dead");
+
+        StartCoroutine(EnemyErase(2.5f));
     }
 
     protected sealed override void Callback(GameObject pObj)
     {
-
         base.Callback(pObj);
     }
 
     protected override void AnimFrameStart()
     {
-        _particleManager?.ShowParticle(ParticleKind.Hit, transform.position);
+        SoundPlayer.instance.PlaySound("E1_walk");
     }
 
     protected override void AnimFrameUpdate()
@@ -232,12 +233,13 @@ public class AI : AIMachine
 
     IEnumerator AttackLogic()
     {
-        if (MyStats.IsAttack)
+        if (MyStats.IsAttack && !IsDead())
         {
             yield return new WaitForSeconds(1f);
             _animtor.SetBool("isAttack", true);
             _attackCollider.SetActive(true);
             yield return new WaitForSeconds(0.05f);
+            SoundPlayer.instance.PlaySound("E1_atk");
             _attackCollider.SetActive(false);
             yield return new WaitForSeconds(1.5f);
             MyStats.IsAttack = false;
@@ -269,35 +271,27 @@ public class AI : AIMachine
     IEnumerator EnemyErase(float _time)
     {
         yield return new WaitForSeconds(_time);
-        Destroy(gameObject, _time);
-        //float progress = 1f;
-
-        //while (_renderer.color.a > 0.1f)
-        //{
-        //    Debug.Log(progress + " : " + _renderer.color.a);
-        //    _renderer.color = new Color(1f, 1f, 1f, 255f/155f);
-        //    progress -= Time.deltaTime;
-        //    yield return null;
-        //}
+        gameObject.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("Attack") && !_animtor.GetBool("isHurt"))
+        if (other.gameObject.CompareTag("Attack") && !_animtor.GetBool("isHurt") && !IsDead())
         {
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
 
-            _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * 5f, ForceMode2D.Impulse);
+            _rigid.AddForce(new Vector2(-_hurtDir.x, 0f) * MyStats.MoveSpeed * 2.5f, ForceMode2D.Impulse);
             _animtor.SetBool("isHurt", true);
             other.gameObject.SetActive(false);
             _attackCollider.SetActive(false);
             MyStats.IsAttack = false;
 
+            SoundPlayer.instance.PlaySound("Obj_Dmg_on_2");
             MyStats.CurHP -= 1;
 
-            if (!IsDead())
+            if (IsDead())
             {
-                StartCoroutine(TimeUtils.TimeStop(0.05f));
+                StartCoroutine(TimeUtils.TimeStop(0.25f));
             }
         }
     }

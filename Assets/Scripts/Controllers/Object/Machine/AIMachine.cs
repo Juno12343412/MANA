@@ -121,7 +121,7 @@ namespace UDBase.Controllers.ObjectSystem
             MyStats = new Stats();
             MyStats.IsTrack = false;
 
-            aiKey = new KeySetting(KeyCode.Q, Talk, KeyKind.Down);
+            aiKey = new KeySetting(KeyCode.J, Talk, KeyKind.Down);
             targetObj = GameObject.FindGameObjectWithTag("Player");
         }
 

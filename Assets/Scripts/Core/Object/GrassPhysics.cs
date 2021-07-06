@@ -1,21 +1,25 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UDBase.Controllers.ParticleSystem;
+using Zenject;
+using MANA.Enums;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class GrassPhysics : MonoBehaviour
 {
     [SerializeField] private float bendForceOnExit = -0.1f;
-    [SerializeField] private bool  windIsEnabled;
+    [SerializeField] private bool windIsEnabled;
     [SerializeField] private float baseWindForce = 0f;
     [SerializeField] private float windPeriod = 0f;
     [SerializeField] private float windOffset;
     [SerializeField] private float windForceMultiplier = 0f;
     [SerializeField] private float bendFactor = 0.5f;
 
+    [Inject]
+    readonly ParticleManager _particleManager;
 
     private Grasses grasses;
-    private bool  isBending;
-    private bool  isRebounding;
+    private bool isBending;
+    private bool isRebounding;
 
     private float exitOffset;
     private float enterOffset;
@@ -61,11 +65,11 @@ public class GrassPhysics : MonoBehaviour
                 isRebounding = true;
             }
         }
-        if(col.CompareTag("Attack"))
+        if (col.CompareTag("Attack"))
         {
+            _particleManager?.ShowParticle(ParticleKind.Obs, transform.position);
             grasses.DestroyGrass();
         }
-        
     }
 
     private void OnTriggerStay2D(Collider2D col)
@@ -112,7 +116,7 @@ public class GrassPhysics : MonoBehaviour
 
             if (!isRebounding)
             {
-                SetHorizontalOffset(m_spring.Simulate()); 
+                SetHorizontalOffset(m_spring.Simulate());
             }
         }
         if (isRebounding)

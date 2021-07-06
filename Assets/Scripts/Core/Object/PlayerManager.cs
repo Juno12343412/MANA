@@ -94,6 +94,16 @@ namespace UDBase.Controllers.ObjectSystem
             /// </summary>
             public bool IsDash;
 
+            /// <summary>
+            /// 현재 이벤트를 진행중인가 ?
+            /// </summary>
+            public bool IsEvent;
+
+            /// <summary>
+            /// 현재 액셩을 진행중인가 ?
+            /// </summary>
+            public bool IsAction;
+
             public PlayerState State;
         }
         public Stats _stats;

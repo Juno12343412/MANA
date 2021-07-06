@@ -3,21 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UDBase.Controllers.ObjectSystem;
-using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.ParticleSystem;
-using Cinemachine;
-using MANA.Enums;
+using UDBase.UI.Common;
 using Zenject;
 
 public class ActionEvent : MonoBehaviour
 {
-    ULogger _log;
+    [Inject]
+    protected readonly ParticleManager _particleManager;
 
     [Inject]
-    readonly ParticleManager _particleManager;
+    protected readonly UIManager _uiManager;
 
     [Inject]
-    PlayerManager _playerManager;
+    protected PlayerManager _playerManager;
+
 
     [Header("Action")]
     [Tooltip("해당 액션에 필요한 연기자들")]
@@ -26,41 +26,66 @@ public class ActionEvent : MonoBehaviour
     [Tooltip("액션에서 움직일 위치들")]
     [SerializeField] protected Vector3[] _movingPos = null;
 
-    protected Dictionary<string, Tuple<Action, float>> _actions = new Dictionary<string, Tuple<Action, float>>();
+    protected Queue<Tuple<Func<bool>, float>> _actions = new Queue<Tuple<Func<bool>, float>>();
 
-    protected Action _curAction = null;
-    protected string _curTake = "";
+    protected bool  _isAwake = false;
+    protected bool  _isStart = false;
+    protected float _actionTime = 0f;
 
-    /// <summary>
-    /// 액션을 추가하는 함수
-    /// </summary>
-    protected void AddAction(string _take, Action _func, float _duration = 1f)
+    protected void AddAction(Func<bool> _func, float _duration = 0f)
     {
-        Debug.Log("Add : " + _take);
-
-        _actions?.Add(_take, new Tuple<Action, float>(_func, _duration));
+        _actions.Enqueue(new Tuple<Func<bool>, float>(_func, _duration));
     }
 
-    protected void PlayAction(string _take)
+    protected bool Empty()
     {
-        Debug.Log("Play : " + _take + " : " + _actions[_take].Item2);
-
-        _curAction = _actions[_take].Item1;
-        _curTake = _take;
-
-        Invoke("WaitAction", _actions[_take].Item2);
+        if (_actions.Count != 0)
+            return false;
+        return true;
     }
 
-    void WaitAction()
+    protected void ClearAction()
     {
-        _curAction();
+        _actions.Clear();
+    }
+
+    protected void Delay(float _duration)
+    {
+        _actions.Enqueue(new Tuple<Func<bool>, float>(() => { return true; }, _duration));
+    }
+
+    protected void UpdateAction()
+    {
+        if (!_isAwake)
+        {
+            _isAwake = true;
+            _uiManager.Find("BaseUI").GetComponent<Animator>().SetInteger("isTalk", 0);
+        }
+
+        if (!Empty())
+        {
+            _actionTime += Time.deltaTime;
+            var scd = _actions.Peek();
+
+            if (scd.Item1() == false || (scd.Item2 != 0f && _actionTime > scd.Item2))
+            {
+                _actionTime = 0f;
+                if (!Empty())
+                    _actions.Dequeue();
+            }
+        }
     }
 
     protected void EndAction()
     {
-        Debug.Log("End");
+        _playerManager._stats.IsAction = false;
 
+        _isStart = false;
+        ClearAction();
         gameObject.SetActive(false);
+
+        _playerManager._stats.IsEvent = false;
+        _uiManager.Find("BaseUI").GetComponent<Animator>().SetInteger("isTalk", 1);
     }
 
     protected bool IsActorAlive(GameObject _obj)
@@ -78,15 +103,26 @@ public class ActionEvent : MonoBehaviour
         return false;
     }
 
-    protected void MovingActor(string _take, GameObject _obj, Vector3 _pos, float _speed)
+    protected void MovingActor(GameObject _obj, Vector3 _pos, float _speed)
     {
-        StartCoroutine(Moving(_take, _obj, _pos, _speed));
+        StartCoroutine(Moving(_obj, _pos, _speed));
     }
 
-    IEnumerator Moving(string _take, GameObject _obj, Vector3 _pos, float _speed)
+    IEnumerator Moving(GameObject _obj, Vector3 _pos, float _speed)
     {
-        float distance = Vector3.Distance(_obj.transform.position, _pos);
+        float distance = Vector3.Distance(_obj.transform.localPosition, _pos);
         float progress = 0f;
+
+        _obj.GetComponent<Animator>().SetBool("isMove", true);
+
+        if (GameObject.FindGameObjectWithTag("Player").transform.localPosition.x < transform.position.x)
+        {
+            _obj.GetComponent<SpriteRenderer>().flipX = false;
+        }
+        else if (GameObject.FindGameObjectWithTag("Player").transform.localPosition.x > transform.position.x)
+        {
+            _obj.GetComponent<SpriteRenderer>().flipX = true;
+        }
         yield return null;
 
         if (_obj != null)
@@ -95,15 +131,17 @@ public class ActionEvent : MonoBehaviour
             {
                 Debug.Log("Moving ...");
 
-                _obj.transform.position = Vector3.Lerp(_obj.transform.position, _pos, _speed * Time.deltaTime);
+                _obj.transform.localPosition = Vector3.Lerp(_obj.transform.localPosition, _pos, _speed * Time.deltaTime);
                 progress += Time.deltaTime;
                 yield return null;
             }
         }
+        _obj.GetComponent<Animator>().SetBool("isMove", false);
+    }
 
-        if (_take != "")
-            PlayAction(_take);
-        else
-            EndAction();
+    void Update()
+    {
+        if (_isStart)
+            UpdateAction();
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.ParticleSystem;
 using Cinemachine;
 using MANA.Enums;
+using Manager.Sound;
 using Zenject;
 
 public class Player : PlayerMachine
@@ -25,7 +25,6 @@ public class Player : PlayerMachine
     [SerializeField] private Sprite _upImg;
 
     [SerializeField] private GameObject _playerEffect = null;
-    [SerializeField] private Image _playerHitFX = null;
 
     private SpriteRenderer _renderer;
     private Animator _animtor;
@@ -33,8 +32,7 @@ public class Player : PlayerMachine
 
     bool isStart = false;
     bool isDash = false;
-    bool isGrand = false;
-    public bool isTest = false;
+    public bool isGrand = true;
 
     [Inject]
     readonly ParticleManager _particleManager;
@@ -64,8 +62,6 @@ public class Player : PlayerMachine
             isStart = true;
             _animtor.enabled = true;
         }
-        if (isTest) _player._stats.IsDash = true;
-        StartCoroutine(CR_ScreenHitFX());
     }
 
     protected sealed override void IdleEvent()
@@ -76,29 +72,34 @@ public class Player : PlayerMachine
             return;
 
         _animtor.SetBool("isWalk", false);
+
+        if (_player._stats.SpecialAttackDuration <= 100)
+            _player._stats.SpecialAttackDuration += Time.deltaTime * _player._stats.MoveSpeed * 2f;
     }
 
     protected sealed override void WalkEvent()
     {
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
 
         if (!_player._stats.IsAttack && !isDash)
         {
             base.WalkEvent();
 
+            if (_player._stats.SpecialAttackDuration <= 100)
+                _player._stats.SpecialAttackDuration += Time.deltaTime * _player._stats.MoveSpeed * 2f;
+
             // 움직이는 로직
-            float x = Input.GetAxisRaw("Horizontal");       
+            float x = Input.GetAxisRaw("Horizontal");
 
             _attackColiders[0].offset = new Vector2(x, 0);
             if (x != 0)
             {
                 if (!_animtor.GetBool("isWalk"))
                 {
-
                     _animtor.SetBool("isWalk", true);
                 }
-                
+
                 if (!_player._stats.IsJump)
                     _particleManager.ShowParticle(ParticleKind.Move, transform.position);
 
@@ -115,7 +116,8 @@ public class Player : PlayerMachine
                 else if (_rigid2D.velocity.x < -_player._stats.MoveSpeed)
                     _rigid2D.velocity = new Vector2(-_player._stats.MoveSpeed, _rigid2D.velocity.y);
 
-                if (Input.GetKeyDown(KeyCode.DownArrow) && _player._stats.IsDash && _player._stats.SpecialAttackDuration >= 20f) {
+                if (Input.GetKeyDown(KeyCode.DownArrow) && _player._stats.IsDash && _player._stats.SpecialAttackDuration >= 20f)
+                {
                     _particleManager.ShowParticle(ParticleKind.Move, transform.position, null, 20);
                     Dash(new Vector2(x, 0));
                 }
@@ -134,14 +136,14 @@ public class Player : PlayerMachine
     {
         base.RunEvent();
 
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
         // 움직이는 로직
     }
 
     protected sealed override void JumpEvent()
     {
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
 
         // 점프하는 로직
@@ -159,7 +161,7 @@ public class Player : PlayerMachine
     {
         base.TalkEvent();
 
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
     }
 
@@ -167,13 +169,15 @@ public class Player : PlayerMachine
     {
         base.AttackEvent();
 
-        if (!isStart && _player._stats.IsAttack)
+        if (!isStart || _player._stats.IsAttack || _player._stats.IsEvent)
             return;
 
         _player._stats.IsAttack = true;
 
         _attackDir.y = Input.GetAxisRaw("Vertical");
-        
+        if (_attackDir.y != 0)
+            _attackColiders[0].GetComponent<BoxCollider2D>().offset = new Vector2(0, _attackDir.y);
+
         _animtor.SetBool("isAttack", true);
         _animtor.SetFloat("AttackY", _attackDir.y);
     }
@@ -182,7 +186,7 @@ public class Player : PlayerMachine
     {
         base.SpecialAttackEvent();
 
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
 
         if (_player._stats.IsJump)
@@ -196,7 +200,7 @@ public class Player : PlayerMachine
     {
         base.DeadEvent();
 
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
     }
 
@@ -237,36 +241,58 @@ public class Player : PlayerMachine
 
     protected override void AnimFrameStart()
     {
-
+        if (!_animtor.GetBool("isDash"))
+            SoundPlayer.instance.PlaySound("P_walk", 1f);
+        else
+            _particleManager?.ShowParticle(ParticleKind.Dash3, transform.position);
     }
 
     protected override void AnimFrameUpdate()
     {
         _attackColiders[0].gameObject.SetActive(true);
+
+        if (_comboGauge == 0)
+            SoundPlayer.instance.PlaySound("P_atk_1", 0.5f);
+        else if (_comboGauge == 1)
+            SoundPlayer.instance.PlaySound("P_atk_2", 0.5f);
+        else if (_comboGauge == 2)
+            SoundPlayer.instance.PlaySound("P_atk_3", 0.5f);
     }
 
     protected override void AnimFrameEnd()
     {
-        if (_animtor.GetBool("isStart") && isGrand) {
+        if (_animtor.GetBool("isStart") && isGrand)
+        {
+            Debug.Log("Start");
+
             _animtor.SetBool("isStart", false);
             isGrand = false;
             isStart = true;
+            _animtor.SetBool("isWalk", false);
+            _animtor.SetBool("isAttack", false);
+            _animtor.SetBool("isDash", false);
+            _animtor.SetBool("isHurt", false);
+            _animtor.SetInteger("Jump", 0);
+            _player._stats.IsJump = false;
+            _player._stats.IsAttack = false;
+            _attackColiders[0].gameObject.SetActive(false);
         }
         else
         {
             _player._stats.IsAttack = false;
             _attackColiders[0].gameObject.SetActive(false);
 
-            if (_animtor.GetInteger("Jump") == 2)
-            {
-                _animtor.SetInteger("Jump", 0);
-                _player._stats.IsJump = false;
-            }
+            //if (_animtor.GetInteger("Jump") == 2)
+            //{
+            //    _animtor.SetInteger("Jump", 0);
+            //    _player._stats.IsJump = false;
+            //}
 
             _animtor.SetBool("isAttack", false);
             _animtor.SetFloat("Attack", 0);
             _animtor.SetInteger("AttackY", 0);
             _animtor.SetBool("isHurt", false);
+            _animtor.SetBool("isDash", false);
         }
     }
 
@@ -276,14 +302,17 @@ public class Player : PlayerMachine
 
         float progress = 0f;
         yield return null;
-    
-        while (progress <= 4.5f && _player._stats.IsJump)
+
+        while (progress <= 1.5f && _player._stats.IsJump)
         {
+            if (progress >= 0.2f)
+                _animtor.SetInteger("Jump", 2);
+
             progress += Time.deltaTime;
             yield return null;
         }
-        
-        if (_player._stats.IsJump && !isGrand)
+
+        if (!isGrand && _player._stats.IsJump)
         {
             Debug.Log("그라디언트 체크 끝");
             isGrand = true;
@@ -311,44 +340,55 @@ public class Player : PlayerMachine
                 progress += Time.deltaTime;
                 yield return null;
             }
-            else if (Input.GetKeyUp(KeyCode.C) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.Space))
+            if (Input.GetKeyUp(KeyCode.C) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.Space))
             {
                 yield return new WaitForSeconds(0.25f);
                 break;
             }
         }
-        if (!isGrand)
+        if (_player._stats.IsJump)
             _animtor.SetInteger("Jump", 2);
     }
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
 
         if (other.gameObject.CompareTag("Ground"))
         {
             if (!isGrand)
             {
-                _animtor.SetInteger("Jump", 0);
-                _player._stats.IsJump = false;
+                if (_rigid2D.velocity.y <= 0.1f)
+                {
+                    _animtor.SetBool("isWalk", false);
+                    _animtor.SetBool("isAttack", false);
+                    _animtor.SetInteger("Jump", 0);
+                    _player._stats.IsJump = false;
+                    _player._stats.IsAttack = false;
+                    _particleManager?.ShowParticle(ParticleKind.Move, transform.position, null, 10);
+                    _attackColiders[0].gameObject.SetActive(false);
+                }
             }
             else
             {
+                SoundPlayer.instance.PlaySound("Map_stone_2", 0.5f);
                 _animtor.SetInteger("Jump", 0);
                 _player._stats.IsJump = false;
                 _animtor.SetBool("isWalk", false);
                 _animtor.SetBool("isStart", true);
+                _attackColiders[0].gameObject.SetActive(false);
                 isStart = false;
 
-                _particleManager?.ShowParticle(ParticleKind.Move, transform.position, null, 25);
+                _particleManager?.ShowParticle(ParticleKind.Move, transform.position, null, 30);
             }
+            SoundPlayer.instance.PlaySound("P_jump_2", 0.5f);
         }
     }
 
     void OnCollisionExit2D(Collision2D other)
     {
-        if (!isStart)
+        if (!isStart || _player._stats.IsEvent)
             return;
 
         if (other.gameObject.CompareTag("Ground"))
@@ -356,42 +396,32 @@ public class Player : PlayerMachine
             if (!isGrand)
             {
                 StartCoroutine(GradientCheck());
+                SoundPlayer.instance.PlaySound("P_jump_1", 0.5f);
+                SoundPlayer.instance.PlaySound("Obj_landing", 0.5f);
+                //_animtor.SetInteger("Jump", 2);
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Vector3 temp = other.transform.position - transform.position;
-        temp = temp.normalized;
+        if (other.gameObject.CompareTag("Ground"))
+            StopCoroutine("GradientCheck");
+
         if (other.gameObject.CompareTag("EnemyAttack") && !_animtor.GetBool("isHurt"))
         {
             other.gameObject.SetActive(false);
 
             GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-
-            _rigid2D.AddForce(new Vector2(-temp.x, 0f) * 5f, ForceMode2D.Impulse);
+            _rigid2D.AddForce(new Vector2(-_attackDir.x, 0f) * 15f, ForceMode2D.Impulse);
 
             _animtor.SetBool("isHurt", true);
-            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
         }
-        if (other.gameObject.CompareTag("Pattern1"))
+
+        if (other.gameObject.CompareTag("Grass"))
         {
-            other.gameObject.SetActive(false);
-
-            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-
-            _animtor.SetBool("isHurt", true);
-            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
-        }
-        if (other.gameObject.CompareTag("Pattern2"))
-        {
-            other.gameObject.SetActive(false);
-
-            GetComponent<CinemachineImpulseSource>().GenerateImpulse();
-            _rigid2D.AddForce(new Vector2(-temp.x, 0f) * 10f, ForceMode2D.Impulse);
-            _animtor.SetBool("isHurt", true);
-            _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, 20.0f / 255.0f);
+            _particleManager?.ShowParticle(ParticleKind.Obs, transform.position);
+            SoundPlayer.instance.PlaySound("Map_leaf_1", 0.2f);
         }
     }
 
@@ -408,9 +438,17 @@ public class Player : PlayerMachine
 
     void Dash(Vector2 _dir)
     {
+        SoundPlayer.instance.PlaySound("P_dash", 0.5f);
+        _animtor.SetBool("isDash", true);
+
+        _particleManager?.ShowParticle(ParticleKind.Dash3, transform.position);
+
         CancelInvoke();
 
-        _particleManager?.ShowParticle(ParticleKind.Dash, transform.position, null, 5);
+        Vector3 v = _renderer.flipX == true ? new Vector3(0, -90, 0) : new Vector3(0, 90f, 0);
+        Vector3 v2 = transform.position; v2.y += 0.8f;
+
+        _particleManager?.ShowParticle(ParticleKind.Dash, v2, v, 1);
 
         ParticleSystem.MainModule r = _playerEffect.GetComponentInChildren<ParticleSystem>().main;
         r.startRotationY = _renderer.flipX == true ? 180f * Mathf.Deg2Rad : 0f;
@@ -433,25 +471,23 @@ public class Player : PlayerMachine
         Invoke("DashEffectEnd", 1f);
     }
 
+    public void OnAction()
+    {
+        _animtor.SetBool("isWalk", false);
+        _animtor.SetBool("isAttack", false);
+        _animtor.SetInteger("Jump", 0);
+        _player._stats.IsJump = false;
+        _player._stats.IsAttack = false;
+    }
+
     void DashEffectEnd()
     {
         _playerEffect.SetActive(false);
+        _animtor.SetBool("isDash", false);
     }
 
     void DashEnd()
     {
         isDash = false;
-    }
-
-    IEnumerator CR_ScreenHitFX()
-    {
-        while (true)
-        {
-            if (_playerHitFX.color.a > 0.0f)
-            {
-                _playerHitFX.color = new Color(_playerHitFX.color.r, _playerHitFX.color.g, _playerHitFX.color.b, _playerHitFX.color.a - 2.0f / 255.0f);
-            }
-            yield return new WaitForSeconds(0.1f);
-        }
     }
 }

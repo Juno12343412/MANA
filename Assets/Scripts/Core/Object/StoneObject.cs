@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 using Cinemachine;
 using Zenject;
 using UDBase.UI.Common;
+using Manager.Sound;
 
 public class StoneObject : MonoBehaviour
 {
@@ -51,6 +52,9 @@ public class StoneObject : MonoBehaviour
 
     public void Explosion()
     {
+        SoundPlayer.instance.PlaySound("Map_stone_1", 0.25f);
+        SoundPlayer.instance.PlaySound("Map_explosion", 0.25f);
+
         if (startEffects != null)
         {
             startEffects.SetActive(true);

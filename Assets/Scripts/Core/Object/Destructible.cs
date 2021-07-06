@@ -6,6 +6,7 @@ using Zenject;
 using UDBase.Controllers.ObjectSystem;
 using UDBase.Controllers.LogSystem;
 using MANA.Enums;
+using Manager.Sound;
 using Pooling;
 
 public class Destructible : AIMachine
@@ -46,6 +47,7 @@ public class Destructible : AIMachine
             GetComponent<Animator>().SetBool("isHurt", true);
             StartCoroutine(ShakeObject());
 
+            SoundPlayer.instance.PlaySound("Map_stone_2");
 
             MyStats.CurHP -= 1;
             if (MyStats.CurHP <= 0)
@@ -59,6 +61,8 @@ public class Destructible : AIMachine
 
     void Dead(GameObject obj)
     {
+        SoundPlayer.instance.PlaySound("Map_stone_1");
+
         for (int i = 0; i < wallPiece.Length; i++)
         {
             wallPiece[i].SetActive(true);

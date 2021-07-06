@@ -9,20 +9,20 @@ namespace Pooling
         GameObject refObj;          // 해당 T가 풀링할 오브젝트
         Transform parent;          // 해당 T의 부모 객체
         Vector3 basePos;         // 해당 T의 기본 좌표
-        Quaternion baseRot;         // 해당 T의 기본 각도
+        Vector3 baseRot;         // 해당 T의 기본 각도
 
         public ObjectPool<T> Init(GameObject _obj, Transform _parent = null, bool _active = false)
         {
-            return Init(_obj, 1, Vector3.zero, Quaternion.identity, _parent, _active);
+            return Init(_obj, 1, Vector3.zero, Vector3.zero, _parent, _active);
         }
-        public ObjectPool<T> Init(GameObject _obj, int _amount = 1, Vector3? _pos = null, Quaternion? _rot = null, Transform _parent = null, bool _active = false)
+        public ObjectPool<T> Init(GameObject _obj, int _amount = 1, Vector3? _pos = null, Vector3? _rot = null, Transform _parent = null, bool _active = false)
         {
             Clear();
 
             refObj = _obj;
             parent = _parent ?? null;
             basePos = _pos ?? Vector3.zero;
-            baseRot = _rot ?? Quaternion.identity;
+            baseRot = _rot ?? Vector3.zero;
 
             for (var iter = 0; iter < _amount; iter++)
             {
@@ -38,8 +38,9 @@ namespace Pooling
         // Prefab 제작
         private T Create()
         {
-            var _obj = Object.Instantiate(refObj, basePos, baseRot, parent).GetComponent<T>();
+            var _obj = Object.Instantiate(refObj, basePos, Quaternion.identity, parent).GetComponent<T>();
             _obj.transform.localPosition = basePos;
+            _obj.transform.localEulerAngles = baseRot;
             _obj.name = _obj.objectName + Count;
 
             Add(_obj);
@@ -48,7 +49,7 @@ namespace Pooling
         }
 
         // Spawn
-        public T Spawn(Vector3? _pos = null, Quaternion? _rot = null, Transform _parent = null)
+        public T Spawn(Vector3? _pos = null, Vector3? _rot = null, Transform _parent = null)
         {
             var obj = Find(find => find.isActive == false);
 
@@ -60,7 +61,7 @@ namespace Pooling
 
             // Is Not Full
             obj.transform.position = _pos ?? basePos;
-            obj.transform.rotation = _rot ?? baseRot;
+            obj.transform.localEulerAngles = _rot ?? baseRot;
             obj.transform.SetParent(_parent ?? parent);
 
             obj.Init();

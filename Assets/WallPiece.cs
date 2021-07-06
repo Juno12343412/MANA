@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Manager.Sound;
 
 public class WallPiece : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class WallPiece : MonoBehaviour
 
     IEnumerator CR_Erase(float _time)
     {
+        SoundPlayer.instance.PlaySound("Map_stone_2");
+
         yield return new WaitForSeconds(_time);
         float progress = 1f;
 

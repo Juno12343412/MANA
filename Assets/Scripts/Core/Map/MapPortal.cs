@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 using Cinemachine;
+using Manager.Sound;
 
 //일정 범위안에 들어오면 다음맵으로 넘어가게 해주는 포탈 스크립트
 public class MapPortal : MonoBehaviour
@@ -70,6 +71,27 @@ public class MapPortal : MonoBehaviour
     {
         if(collision.gameObject.name == "Player")
         {
+            if (nowMapObject.name == "Tuto_2_Map")
+            {
+                SoundPlayer.instance.StopBGM();
+                SoundPlayer.instance.PlayBGM("Bg_3");
+            }
+            else if (nowMapObject.name == "Tuto_3_Map")
+            {
+                SoundPlayer.instance.StopBGM();
+                SoundPlayer.instance.PlayBGM("Bg_4");
+            }
+            else if (nowMapObject.name == "Tuto_4_Map")
+            {
+                SoundPlayer.instance.StopBGM();
+                SoundPlayer.instance.PlayBGM("Bg_5");
+            }
+            else if (nowMapObject.name == "Tuto_5_Map")
+            {
+                SoundPlayer.instance.StopBGM();
+                SoundPlayer.instance.PlayBGM("Bg_6");
+            }
+
             sceneChangefade.GetComponent<Animator>().SetTrigger("SceneChange");
             nowMapObject.SetActive(false);
             nextMapObject.SetActive(true);

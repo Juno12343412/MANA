@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using Manager.Sound;
 
 public class Title : MonoBehaviour
 {
@@ -11,10 +12,19 @@ public class Title : MonoBehaviour
     [SerializeField] Animator midLight;
     private bool isStart = false;
 
+    void Start()
+    {
+        SoundPlayer.instance.PlayBGM("Bg_1");
+    }
+
     void Update()
     {
         if(Input.anyKey && !isStart)
         {
+            SoundPlayer.instance.StopBGM();
+            SoundPlayer.instance.PlayBGM("Bg_2");
+            SoundPlayer.instance.PlaySound("UI");
+
             isStart = true;
             cam1.Priority = 10;
             cam2.Priority = 11;

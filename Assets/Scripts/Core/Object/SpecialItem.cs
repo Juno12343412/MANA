@@ -6,6 +6,7 @@ using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.ParticleSystem;
 using Cinemachine;
 using MANA.Enums;
+using Manager.Sound;
 using Zenject;
 
 public class SpecialItem : AIMachine
@@ -48,6 +49,9 @@ public class SpecialItem : AIMachine
 
     void GetItem()
     {
+        SoundPlayer.instance.PlaySound("Item");
+        SoundPlayer.instance.PlaySound("Map_stone_1");
+
         GetComponent<CinemachineImpulseSource>().GenerateImpulse();
 
         _playerManager._stats.IsDash = true;
@@ -60,6 +64,6 @@ public class SpecialItem : AIMachine
     
     void StartingTalk()
     {
-        TextBox.instance.SetTalk(_textList, true, transform.position);
+        TextBox.instance.SetTalk(_textList, false, transform.position);
     }
 }
